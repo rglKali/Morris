@@ -1,0 +1,7 @@
+name = Classic
+size = 7
+points = a1, d1, g1, b2, d2, f2, c3, d3, e3, a4, b4, c4, e4, f4, g4, c5, d5, e5, b6, d6, f6, a7, d7, g7
+connects = a1d1, d1g1, b2d2, d2f2, c3d3, d3e3, a4b4, b4c4, e4f4, f4g4, c5d5, d5e5, b6d6, d6f6, a7d7, d7g7
+pieces = 6
+unite = False
+skip = False
