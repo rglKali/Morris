@@ -16,6 +16,7 @@
       3. 6 Men Morris Board template
       4. 9 Men Morris Board template
       5. 12 Men Morris Board template
+   4. Create possibility to play the game on local server (optinonal)
 2. Graphical User Interface
    1. Create all the necessary objects:
       1. Board widget

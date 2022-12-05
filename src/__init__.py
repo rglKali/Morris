@@ -1,2 +1,7 @@
+from .gui import Window, Menu
+
+
 def main():
-    pass
+    window = Window(width=640, height=640)
+    window.view = Menu(window)
+    window.run()

@@ -1,4 +1,3 @@
-
 import subprocess
 import sys
 import tkinter as tk
@@ -66,7 +65,7 @@ class CustomCanvas:
         'Touche': '<Key>'
     }
 
-    _default_ev = ['ClicGauche', 'ClicDroit', 'Touche']
+    _default_ev = ['ClicGauche', 'ClicDroit', 'Touche', 'Deplacement']
 
     def __init__(self, width, height, refresh_rate=100, events=None):
         # width and height of the canvas
