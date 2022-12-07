@@ -1,35 +1,10 @@
 from time import time
 
 
-class Class:
-    def __init__(self):
-        self.state = True
-
-    def action(self):
-        if not self.state:
-            return
-        else:
-            pass
-
-
-class SubClass(Class):
-    def __init__(self):
-        super().__init__()
-        self.state = False
-
-    def action(self):
-        super().action()
-        print(self.state)
-
-
-class List:
-    def __init__(self, *args):
-        self.widgets = list(args)
-        print(self.widgets)
-
-
 def main():
-    pass
+    hitbox = [range(10, 20), range(10, 20)]
+    if 12 in hitbox[0] and 15 in hitbox[1]:
+        print('y')
 
 
 if __name__ == '__main__':

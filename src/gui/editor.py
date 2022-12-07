@@ -2,7 +2,6 @@ import json
 
 from . import fltk as tk
 
-from .settings import settings as cfg
 from .utils import text
 from .objects import View, Input, Button, WidgetGroup, Point
 
@@ -42,7 +41,7 @@ class Editor(View):
         elif screen == 2:
             if not self.points:
                 self.points = WidgetGroup()
-                [self.points.extend([Point(x*100 + 50, y*100 + 50, active=True) for x in range(int(
+                [self.points.extend([Point(x*100 + 50, y*100 + 50, self.window.cfg.point_radius, active=True) for x in range(int(
                     self.size))]) for y in range(int(self.size))]
             else:
                 self.points.activate()
@@ -108,6 +107,7 @@ class Editor(View):
 
         elif self.screen == 2:
             self.points.draw()
+            self.connects.draw()
 
         elif self.screen == 3:
             pass

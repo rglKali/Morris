@@ -1,6 +1,21 @@
-def data_to_json():
-    return None
+import dataclasses as dc
 
 
-def json_to_data():
-    return None
+@dc.dataclass
+class Board:
+    pass
+
+
+@dc.dataclass
+class Point:
+    pass
+
+
+@dc.dataclass
+class Connect:
+    pass
+
+
+@dc.dataclass
+class Mill:
+    pass

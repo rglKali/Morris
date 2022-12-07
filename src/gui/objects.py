@@ -3,8 +3,6 @@ import time as tm
 from . import fltk as tk
 from . import palette as pal
 from .utils import text
-from .settings import settings as cfg
-from ..engine import Engine
 
 
 class NoViewInTheWindow(Exception):
@@ -16,13 +14,13 @@ class InputError(Exception):
 
 
 class Window:
-    def __init__(self, bg: str = pal.LIGHT_PEACH):
+    def __init__(self, engine, cfg, bg: str = pal.LIGHT_PEACH):
         self.view = None
         self.active = True
         self.fps = list()
         self.bg = bg
-        self.engine = Engine()
-        self.engine.open_board('Classic')
+        self.engine = engine
+        self.cfg = cfg.gui
 
     def update(self):
         ev = tk.donne_ev()
@@ -39,7 +37,7 @@ class Window:
     def draw(self):
         tk.efface_tout()
         # Background
-        tk.rectangle(0, 0, cfg.width, cfg.height, self.bg, self.bg)
+        tk.rectangle(0, 0, self.cfg.width, self.cfg.height, self.bg, self.bg)
 
         if self.view:
             self.view.draw()
@@ -49,7 +47,7 @@ class Window:
         tk.mise_a_jour()
 
     def run(self):
-        tk.cree_fenetre(cfg.width, cfg.height)
+        tk.cree_fenetre(self.cfg.width, self.cfg.height)
 
         while self.active:
             start = tm.time()
@@ -66,6 +64,7 @@ class Window:
 class View:
     def __init__(self, window, *args):
         self.window = window
+        self.engine = window.engine
 
     def draw(self):
         pass
@@ -200,22 +199,22 @@ class Button(Widget):
         super().__init__([(x1 + x2) / 2, (y1 + y2) / 2], active)
         self.text = text
         self.color = color
-        self.hitbox = [min(x1, x2), max(x1, x2)], [min(y1, y2), max(y1, y2)]
+        self.hitbox = [range(min(x1, x2), max(x1, x2)), range(min(y1, y2), max(y1, y2))]
 
     def __str__(self):
         return self.text
 
     def draw(self):
         if self.active:
-            tk.rectangle(self.hitbox[0][0], self.hitbox[0][1], self.hitbox[1][0], self.hitbox[1][1])
+            tk.rectangle(self.hitbox[0][0], self.hitbox[0][-1], self.hitbox[-1][0], self.hitbox[-1][-1])
             text(self.x, self.y, self.text, location='center')
 
 
 class Point(Widget):
-    def __init__(self, x: any([int, float]), y: any([int, float]), active: bool = True):
+    def __init__(self, x: any([int, float]), y: any([int, float]), radius: int, active: bool = True):
         super().__init__(x, y, active)
         self.exists = False
-        self.radius = cfg.point_radius
+        self.radius = radius
 
     def update(self):
         pass
