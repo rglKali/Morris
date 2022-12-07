@@ -13,7 +13,7 @@ class Engine:
         self.pieces = None
 
     def open_board(self, name: str):
-        boards = json.load(open('res/boards.json'))
+        boards = json.load(open('data/boards.json'))
         board = [board for board in boards if board['name'] == name]
         if not len(board):
             raise BoardNotExists

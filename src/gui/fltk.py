@@ -65,20 +65,22 @@ class CustomCanvas:
         'Touche': '<Key>'
     }
 
-    _default_ev = ['ClicGauche', 'ClicDroit', 'Touche', 'Deplacement']
+    _default_ev = ['ClicGauche', 'ClicDroit', 'Touche']
 
-    def __init__(self, width, height, refresh_rate=100, events=None):
-        # width and height of the canvas
-        self.width = width
-        self.height = height
-        self.interval = 1/refresh_rate
+    def __init__(self, width: any([int, None]), height: any([int, None]), fullscreen: bool, refresh_rate=100, events=None):
 
         # root Tk object
         self.root = tk.Tk()
 
+        # width and height of the canvas
+        self.width = width if width else self.root.winfo_screenwidth()
+        self.height = height if width else self.root.winfo_screenheight()
+        self.interval = 1/refresh_rate
+        self.root.attributes('-fullscreen', fullscreen)
+
         # canvas attached to the root object
-        self.canvas = tk.Canvas(self.root, width=width,
-                                height=height, highlightthickness=0)
+        self.canvas = tk.Canvas(self.root, width=self.width,
+                                height=self.height, highlightthickness=0)
 
         # adding the canvas to the root window and giving it focus
         self.canvas.pack()
@@ -162,7 +164,7 @@ class FenetreDejaCree(Exception):
 #############################################################################
 
 
-def cree_fenetre(largeur, hauteur, frequence=100):
+def cree_fenetre(largeur=None, hauteur=None, fullscreen=False, frequence=100):
     """
     Crée une fenêtre de dimensions ``largeur`` x ``hauteur`` pixels.
     :rtype:
@@ -171,7 +173,7 @@ def cree_fenetre(largeur, hauteur, frequence=100):
     if __canevas is not None:
         raise FenetreDejaCree(
             'La fenêtre a déjà été crée avec la fonction "cree_fenetre".')
-    __canevas = CustomCanvas(largeur, hauteur, frequence)
+    __canevas = CustomCanvas(largeur, hauteur, fullscreen, frequence)
 
 
 def ferme_fenetre():
