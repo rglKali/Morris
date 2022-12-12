@@ -2,14 +2,10 @@ import time as tm
 
 from . import fltk as tk
 from . import palette as pal
-from .utils import text
+from .utils import text, wh
 
 
 class NoViewInTheWindow(Exception):
-    pass
-
-
-class InputError(Exception):
     pass
 
 
@@ -20,12 +16,16 @@ class Window:
         self.fps = list()
         self.bg = bg
         self.engine = engine
+
+        # Manage Settings
         self.cfg = cfg.gui
+        self.cfg.width = self.cfg.scale * 16 if not self.cfg.fullscreen else None
+        self.cfg.height = self.cfg.scale * 9 if not self.cfg.fullscreen else None
 
     def update(self):
         ev = tk.donne_ev()
         if ev:
-            if ev[0] == 'Quitte':
+            if ev[0] == 'Quitte' or (ev[0] == 'Touche' and ev[1].keysym == 'Escape'):
                 self.active = False
 
             elif self.view:
@@ -47,7 +47,8 @@ class Window:
         tk.mise_a_jour()
 
     def run(self):
-        tk.cree_fenetre(self.cfg.width, self.cfg.height)
+        tk.cree_fenetre(self.cfg.width, self.cfg.height, fullscreen=self.cfg.fullscreen)
+        self.cfg.width, self.cfg.height = wh()
 
         while self.active:
             start = tm.time()
@@ -65,6 +66,7 @@ class View:
     def __init__(self, window, *args):
         self.window = window
         self.engine = window.engine
+        self.cfg = window.cfg
 
     def draw(self):
         pass
@@ -74,12 +76,18 @@ class View:
 
 
 class Widget:
-    def __init__(self, x: any([float, int]), y: any([float, int]), active: bool = True, *args):
-        self.x, self.y = x, y
+    def __init__(self, x: int, y: int, active: bool = True, parent=None):
+        if parent:
+            self.x, self.y = parent.x + x, parent.y + y
+            parent.children.append(self)
+        else:
+            self.x, self.y = x, y
         self.active = active
+        self.children = WidgetGroup()
 
     def activate(self):
         self.active = not self.active
+        self.children.activate()
 
     def update(self, *args):
         pass
@@ -109,119 +117,17 @@ class WidgetGroup(list):
         pass
 
 
-class Input(Widget):
-    def __init__(self, x: any([int, float]), y: any([int, float]), active: bool = True,
-                 length: int = None, spaces: bool = True, selected: bool = False,
-                 chars: str = 'azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN1234567890'):
-        super().__init__(x, y, active)
-        self.data = str()
-        self.selector = int()
-        self.length = length
-        self.spaces = spaces
-        self.selected = selected
-        self.chars = chars
-
-    def __str__(self):
-        if len(self.data) != 0:
-            return self.data
-        else:
-            raise InputError
-
-    def __int__(self):
-        if self.data.isnumeric():
-            return int(self.data)
-        else:
-            raise InputError
-
-    def __bool__(self):
-        return bool(len(self.data))
-
-    def select(self):
-        self.selected = not self.selected
-
-    def update(self, key):
-        if key == 'Left' and self.selector > 0:
-            self.selector -= 1
-        elif key == 'Right' and self.selector < len(self.data):
-            self.selector += 1
-        elif key == 'BackSpace' and len(self.data) > 0:
-            self.data = self.data[:-1]
-        elif key in self.chars and (not self.length or len(self.data) < self.length):
-            self.data = self.data[:self.selector] + key + self.data[self.selector:]
-            self.selector += 1
-        elif key == 'space' and self.spaces:
-            self.data = self.data[:self.selector] + ' ' + self.data[self.selector:]
-            self.selector += 1
-
-    def draw(self):
-        if self.active:
-            if round(tm.time()) % 2 and self.selected:
-                text(self.x, self.y, self.data[:self.selector] + '|' + self.data[self.selector:])
-            elif self.selected:
-                text(self.x, self.y, self.data[:self.selector] + ' ' + self.data[self.selector:])
-            else:
-                text(self.x, self.y, self.data)
-
-
-class CheckBox(Widget):
-    def __init__(self, x: any([int, float]), y: any([int, float]), active: bool = True,
-                 state: any([bool, None]) = None, size: any([int, float]) = 10):
-        super().__init__(x, y, active)
-        self.state = state
-        self.size = size
-
-    def __bool__(self):
-        if type(self.state) is bool:
-            return self.state
-        else:
-            raise InputError
-
-    def select(self):
-        if type(self.state) is bool:
-            self.state = not self.state
-        else:
-            self.state = True
-
-    def draw(self):
-        if self.active:
-            tk.rectangle(self.x, self.y, self.x + self.size, self.y + self.size)
-            if self.state is True:
-                tk.ligne(self.x, self.y + self.size/2, self.x + self.size/2, self.y + self.size)
-                tk.ligne(self.x + self.size/2, self.y + self.size, self.x + self.size, self.y)
-            elif self.state is False:
-                tk.ligne(self.x, self.y, self.x + self.size, self.y + self.size)
-                tk.ligne(self.x + self.size, self.y, self.x, self.y + self.size)
-
-
 class Button(Widget):
-    def __init__(self, x1: any([int, float]), y1: any([int, float]), x2: any([int, float]), y2: any([int, float]),
-                 active: bool = True, text: str = '', color: str = pal.GREEN):
-        super().__init__([(x1 + x2) / 2, (y1 + y2) / 2], active)
+    def __init__(self, x: int, y: int, width: int, height: int, text: str, color):
+        super().__init__(x, y)
+
         self.text = text
+        self.ax, self.ay, self.bx, self.by = x - width/2, y - height/2, x + width/2, y + height/2
         self.color = color
-        self.hitbox = [range(min(x1, x2), max(x1, x2)), range(min(y1, y2), max(y1, y2))]
 
-    def __str__(self):
-        return self.text
-
-    def draw(self):
-        if self.active:
-            tk.rectangle(self.hitbox[0][0], self.hitbox[0][-1], self.hitbox[-1][0], self.hitbox[-1][-1])
-            text(self.x, self.y, self.text, location='center')
-
-
-class Point(Widget):
-    def __init__(self, x: any([int, float]), y: any([int, float]), radius: int, active: bool = True):
-        super().__init__(x, y, active)
-        self.exists = False
-        self.radius = radius
-
-    def update(self):
+    def click(self):
         pass
 
     def draw(self):
-        if self.active:
-            if self.exists:
-                tk.cercle(self.x, self.y, self.radius, remplissage=pal.DARK_GREY)
-            else:
-                tk.cercle(self.x, self.y, self.radius, remplissage=pal.LIGHT_GREY)
+        tk.rectangle(self.ax, self.ay, self.bx, self.by, '#000000', self.color)
+        text(self.x, self.y, self.text, location='center')
