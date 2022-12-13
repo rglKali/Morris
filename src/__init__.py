@@ -21,12 +21,14 @@ class ConfigItem:
         return js
 
 
+# Setting up the Config
+cfg = ConfigItem(json.load(open('data/config.json')))
+
+# Setting up the Engine
+engine = Engine()
+
+
 def main():
-    cfg = ConfigItem(json.load(open('data/config.json')))
-
-    # Setting up the Engine
-    engine = Engine()
-
     # Arguments GUI/UI version
     args = ap.ArgumentParser()
     args.add_argument('--ui', action='store_true', help='Set this parameter, if you want to run the ui version')
@@ -35,19 +37,19 @@ def main():
 
     if args.gui and not args.ui:
         from .gui import gui
-        gui(engine, cfg)
+        gui()
     elif args.ui and not args.gui:
         from .ui import ui
-        ui(engine, cfg)
+        ui()
 
-    # No arguments mentioned, running default
+    # Running default
     else:
         if cfg.globals.gui:
             from .gui import gui
-            gui(engine, cfg)
+            gui()
         else:
             from .ui import ui
-            ui(engine, cfg)
+            ui()
 
     # Save config
     json.dump(cfg.save(), open('data/config.json', 'w'), indent=4)

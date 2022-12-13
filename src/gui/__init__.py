@@ -1,9 +1,5 @@
-from .objects import Window
-from .menu import Menu
-from .editor import Editor
+from .sample import sample
 
 
-def gui(engine, cfg):
-    window = Window(engine, cfg)
-    window.view = Menu(window)
-    window.run()
+def gui():
+    sample()

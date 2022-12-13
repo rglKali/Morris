@@ -6,11 +6,20 @@
     "ai": {},
     "network": {},
     "gui": {
-        "width": 640,
-        "height": 640,
+        "width": 16,
+        "height": 9,
+        "scale": 48,
         "fullscreen": false,
-        "point_radius": 20,
-        "line_thickness": 10,
+        "font": {
+            "name": "JetBrains Mono",
+            "size": 20
+        },
+        "radius": 20,
+        "thickness": 10,
+        "hitbox": {
+            "x": 0,
+            "y": 0
+        },
         "palette": {
             "black": "#000000",
             "dark_blue": "#1D2B53",

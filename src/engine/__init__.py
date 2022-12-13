@@ -1,36 +1,43 @@
-from .objects import Board, Player
+from .objects import Board, Point
+import random as rd
 import json
+import time
 
 
-class BoardNotExists(Exception):
+class TooMuchPlayers(Exception):
     pass
+
+
+class Player:
+    def __init__(self, turn: int):
+        self.turn = turn
+        self.key = ''.join([rd.choice('0123456789ABCDEF') for i in range(8)])
+        self.game_time = None
+        self.move_time = None
+
+    @property
+    def token(self):
+        return self.key
 
 
 class Engine:
     def __init__(self):
-        self.board = None
-        self.players = [Player, Player]
-        self.pieces = None
+        self.players = list()
+        self.turn = 0
+        self.objects = None
 
-    def open_board(self, name: str):
-        boards = json.load(open('data/boards.json'))
-        board = [board for board in boards if board['name'] == name]
-        if not len(board):
-            raise BoardNotExists
+    def new_board(self, data: dict):
+        pass
+
+    def _get_mills(self, connects: list):
+        pass
+
+    def new_player(self):
+        if len(self.players) > 2:
+            raise TooMuchPlayers
         else:
-            self.board = Board(board[0])
+            self.players.append(Player(len(self.players) + 1))
+            return self.players[-1].token
 
-    def load_board(self, data: dict):
-        self.board = Board(data)
-
-    def save_game(self):
-        pass
-
-    def load_game(self):
-        pass
-
-    def get_moves(self):
-        pass
-
-    def move(self):
-        pass
+    def get_current_status(self):
+        return (-1, 1)
