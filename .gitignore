@@ -3,6 +3,10 @@
 # Jetbrains IDE
 .idea/
 
+# Test files
+test.py
+src__old/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
