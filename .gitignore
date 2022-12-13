@@ -3,9 +3,9 @@
 # Jetbrains IDE
 .idea/
 
-# Test files
-test.py
+# Test & old files
 __old/
+test.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

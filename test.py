@@ -1,14 +1,12 @@
-from time import time
+import time as tm
 
 
 def main():
-    hitbox = [range(10, 20), range(10, 20)]
-    if 12 in hitbox[0] and 15 in hitbox[1]:
-        print('y')
+    pass
 
 
 if __name__ == '__main__':
-    start = time()
+    start = tm.time()
     main()
-    end = time()
-    print(f'Total: {round(end - start, 2)} seconds')
+    end = tm.time()
+    print(f'Total: {end - start} seconds')
