@@ -55,7 +55,7 @@ class Window(CustomCanvas):
     def on_key_press(self, key):
         pass
 
-    def on_mouse_press(self, x, y):
+    def on_mouse_press(self, x, y, key):
         pass
 
     def quit(self):
@@ -75,7 +75,7 @@ class View:
     def on_key_press(self, key: str):
         pass
 
-    def on_mouse_press(self, x: int, y: int):
+    def on_mouse_press(self, x: int, y: int, key):
         pass
 
 
@@ -141,8 +141,10 @@ def run():
                 return
             elif type_ev(ev) == 'Touche':
                 window.on_key_press(touche(ev))
-            else:
-                window.on_mouse_press(abscisse(ev), ordonnee(ev))
+            elif type_ev(ev) == 'ClicGauche':
+                window.on_mouse_press(abscisse(ev), ordonnee(ev), key='Left')
+            elif type_ev(ev) == 'ClicDroit':
+                window.on_mouse_press(abscisse(ev), ordonnee(ev), key='Right')
 
         window.on_update(tm.time() - window.last_update)
         if window.view:

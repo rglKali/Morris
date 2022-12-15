@@ -1,5 +1,5 @@
-from .pytk import run, sample
+from .pytk import run, sample2
 
 
 def gui():
-    sample.run_sample()
+    sample2.run_sample()

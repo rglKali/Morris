@@ -27,7 +27,7 @@ class SampleRect(Sprite):
 
 class SampleWindow(Window):
     def __init__(self):
-        super().__init__(offset=[200, 0])
+        super().__init__()
         self.rect = SampleRect(50, 300, 10, 10)
         self.circle = SampleCircle(100, 400, 20)
 
