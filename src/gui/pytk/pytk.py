@@ -1,8 +1,7 @@
 from .fltk import CustomCanvas, type_ev, touche, abscisse, ordonnee
 import time as tm
-import math as mt
 import random as rd
-from .. import cfg
+from ... import cfg
 from typing import Optional
 
 
@@ -22,6 +21,7 @@ __all__ = [
     'hitbox_rect',
     'hitbox_circle'
 ]
+__version__ = 1.1
 
 """
 pytk is a package created by rglKali on top of the fltk library to turn it into an OOP library
@@ -33,8 +33,10 @@ _window: Optional['Window'] = None
 
 # Classes
 class Window(CustomCanvas):
-    def __init__(self, width: int = cfg.gui.scale * cfg.gui.width, height: int = cfg.gui.scale * cfg.gui.height, fullscreen: bool = cfg.gui.fullscreen, refresh_rate: int = 120):
+    def __init__(self, width: int = cfg.gui.width, height: int = cfg.gui.height,
+                 fullscreen: bool = cfg.gui.fullscreen, offset: list[int] = (0, 0), refresh_rate: int = 120):
         super().__init__(width, height, refresh_rate)
+        self.ox, self.oy = offset
         if fullscreen:
             self.root.attributes('-fullscreen', True)
             self.width = self.root.winfo_screenwidth()
@@ -43,9 +45,6 @@ class Window(CustomCanvas):
         self.active = True
         self.view = None
         set_window(self)
-
-    def setup(self):
-        pass
 
     def on_update(self, delta_time: float):
         pass
@@ -66,10 +65,6 @@ class Window(CustomCanvas):
 class View:
     def __init__(self):
         self.window = get_window()
-        self.setup()
-
-    def setup(self):
-        pass
 
     def on_update(self, delta_time: float):
         pass
@@ -77,36 +72,34 @@ class View:
     def on_draw(self):
         pass
 
-    def on_key_press(self, key):
+    def on_key_press(self, key: str):
         pass
 
-    def on_mouse_press(self, x, y):
+    def on_mouse_press(self, x: int, y: int):
         pass
 
 
 class Sprite:
     def __init__(self, x: int, y: int, hitbox: list = None):
         self.window = get_window()
+        # self.x, self.y = x + self.window.ox, y + self.window.oy
         self.x, self.y = x, y
         if hitbox:
-            self.hitbox = [(x + i, y + j) for i, j in hitbox]
+            self.hitbox = [(self.x + i, self.y + j) for i, j in hitbox]
         else:
-            self.hitbox = [(x, y)]
-
-    def draw(self):
-        pass
+            self.hitbox = [(self.x, self.y)]
 
     def update(self):
         pass
 
+    def draw(self):
+        pass
+
     def collides_with_point(self, x: int, y: int):
-        if (x, y) in self.hitbox:
+        if (x - self.window.ox, y - self.window.oy) in self.hitbox:
             return True
         else:
             return False
-
-    def distance_to_point(self, x: int, y: int):
-        return mt.sqrt((self.x - x) ** 2 + (self.y - y) ** 2)
 
 
 class SpriteList(list):
@@ -175,11 +168,6 @@ def run():
     print(f'Average FPS: {round(len(fps)/sum(fps), 2)}')
 
 
-def get_random_color():
-    colors = [cfg.gui.palette.green, cfg.gui.palette.red, cfg.gui.palette.orange, cfg.gui.palette.yellow, cfg.gui.palette.pink]
-    return rd.choice(colors)
-
-
 def hitbox_circle(radius: int):
     hitbox = list()
     for x in range(-radius, radius + 1):
@@ -197,21 +185,34 @@ def hitbox_rect(width: int, height: int):
     return hitbox
 
 
-def draw_line(ax: int, ay: int, bx: int, by: int, color: str = cfg.gui.palette.black, thickness: int = cfg.gui.thickness):
+def draw_line(ax: int, ay: int, bx: int, by: int,
+              color: str = cfg.gui.palette.black, thickness: int = cfg.gui.thickness):
     w = get_window()
-    w.canvas.create_line(ax, ay, bx, by, fill=color, width=thickness)
+    w.canvas.create_line(ax + w.ox, ay + w.oy, bx + w.ox, by + w.oy, fill=color, width=thickness)
 
 
-def draw_circle(x: int, y: int, radius: int = cfg.gui.radius, color: str = cfg.gui.palette.light_grey, outline: str = cfg.gui.palette.black, thickness: int = cfg.gui.thickness):
+def draw_circle(x: int, y: int, radius: int = cfg.gui.radius, color: str = cfg.gui.palette.light_grey,
+                outline: str = cfg.gui.palette.black, thickness: int = cfg.gui.thickness):
     w = get_window()
-    w.canvas.create_oval(x - radius, y - radius, x + radius, y + radius, outline=outline, fill=color, width=thickness)
+    w.canvas.create_oval(x - radius + w.ox, y - radius + w.oy, x + radius + w.ox, y + radius + w.oy,
+                         fill=color, outline=outline, width=thickness)
 
 
-def draw_rect(x: int, y: int, width: int, height: int, color: str = cfg.gui.palette.light_grey, outline: str = cfg.gui.palette.black, thickness: int = cfg.gui.thickness):
+def draw_rect(x: int, y: int, width: int, height: int, color: str = cfg.gui.palette.light_grey,
+              outline: str = cfg.gui.palette.black, thickness: int = cfg.gui.thickness):
     w = get_window()
-    w.canvas.create_rectangle(x - width//2, y - height//2, x + width//2, y + height//2, fill=color, outline=outline, width=thickness)
+    w.canvas.create_rectangle(x - width//2 + w.ox, y - height//2 + w.oy, x + width//2 + w.ox, y + height//2 + w.oy,
+                              fill=color, outline=outline, width=thickness)
 
 
-def draw_text(x: int, y: int, text: str, font_name: str = cfg.gui.font.name, font_size: int = cfg.gui.font.size, color: str = cfg.gui.palette.black, location: str = 'center'):
+def draw_text(x: int, y: int, text: str, font_name: str = cfg.gui.font.name, font_size: int = cfg.gui.font.size,
+              color: str = cfg.gui.palette.black, location: str = 'center'):
     w = get_window()
-    w.canvas.create_text(x, y, text=text, font=(font_name, font_size), fill=color, anchor=location)
+    w.canvas.create_text(x + w.ox, y + w.oy, text=text, font=(font_name, font_size), fill=color, anchor=location)
+
+
+def get_random_color(colors: list[str] = None):
+    if colors:
+        return rd.choice(colors)
+    else:
+        return rd.choice(list(vars(cfg.gui.palette).values()))

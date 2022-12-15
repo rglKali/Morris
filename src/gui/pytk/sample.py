@@ -1,5 +1,5 @@
-from .. import cfg
-from .pytk import *
+from ... import cfg
+from . import *
 
 
 class SampleCircle(Sprite):
@@ -26,7 +26,8 @@ class SampleRect(Sprite):
 
 
 class SampleWindow(Window):
-    def setup(self):
+    def __init__(self):
+        super().__init__(offset=[200, 0])
         self.rect = SampleRect(50, 300, 10, 10)
         self.circle = SampleCircle(100, 400, 20)
 
@@ -46,9 +47,9 @@ class SampleWindow(Window):
     def on_mouse_press(self, x, y):
         if self.circle.collides_with_point(x, y):
             self.circle.color = get_random_color()
+        print(x, y)
 
 
-def sample():
+def run_sample():
     w = SampleWindow()
-    w.setup()
     run()

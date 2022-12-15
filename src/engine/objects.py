@@ -1,13 +1,22 @@
 import dataclasses as dc
-import time as tm
-from typing import List
+
+
+@dc.dataclass
+class Player:
+    turn: bool
+    token: str
+    game: any([int, None])
+    move: any([int, None])
+    pieces: int
+    phase: int
+    history: list
 
 
 @dc.dataclass
 class Point:
-    player: int
-    x: int
-    y: int
+    player: any(['Player', None])
+    location: list[int]
+    neighbors: list['Point']
 
 
 @dc.dataclass
@@ -16,8 +25,7 @@ class Board:
     size: int
     move: float
     game: float
-    points: list
-    connects: List[List[Point]]
-    mills: List[List[Point]]
+    points: list['Point']
+    pieces: int
     unite: bool
     skip: bool
