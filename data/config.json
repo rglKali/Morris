@@ -2,24 +2,30 @@
     "globals": {
         "gui": true
     },
-    "engine": {},
+    "engine": {
+        "token": {
+            "length": 6,
+            "symbols": "0123456789ABCDEF"
+        }
+    },
     "ai": {},
-    "network": {},
+    "network": {
+        "port": 2310
+    },
     "gui": {
-        "width": 16,
-        "height": 9,
-        "scale": 48,
+        "width": 1200,
+        "height": 675,
         "fullscreen": false,
+        "offset": {
+            "x": 0,
+            "y": 0
+        },
         "font": {
             "name": "JetBrains Mono",
             "size": 20
         },
         "radius": 20,
         "thickness": 10,
-        "hitbox": {
-            "x": 0,
-            "y": 0
-        },
         "palette": {
             "black": "#000000",
             "dark_blue": "#1D2B53",
