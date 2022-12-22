@@ -33,9 +33,6 @@ Represents the height of the window.
 #### fullscreen (required, default) ``bool``
 ``True``, if window is in fullscreen mode and ``False``, if not.
 
-#### offset (required, default) ``tuple(int, int)``
-Represents the window offset.
-
 #### view (optional) ``View``
 Represents the current window View, if any.
 

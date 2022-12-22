@@ -25,3 +25,19 @@
 
 ``PyTk Samples``: Minor Hotfix.
 1. Removed ``setup`` for ``SampleWindow`` class, according to the sources changes.
+
+
+### 22.12.2022 - Release 1.2
+``PyTk Sources``: Update.
+1. Removed Offset feature (useless)
+2. Added resizing algorithms, according to the user's parameters and config info
+3. Added division between Right and Left mouse clicks
+
+``PyTk Docs``: Hotfix.
+1. Removed offset information
+
+``PyTk Samples``: Refactor.
+1. Updated sample2.py according to new resizing feature
+2. Removed sample.py (doesn't support the new version)
+3. Added features from sample.py to sample2.py
+4. Renamed sample2.py to sample.py

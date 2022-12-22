@@ -22,6 +22,7 @@ __all__ = [
     'hitbox_circle'
 ]
 __version__ = 1.1
+__license__ = 'MIT'
 
 """
 pytk is a package created by rglKali on top of the fltk library to turn it into an OOP library
@@ -34,13 +35,15 @@ _window: Optional['Window'] = None
 # Classes
 class Window(CustomCanvas):
     def __init__(self, width: int = cfg.gui.width, height: int = cfg.gui.height,
-                 fullscreen: bool = cfg.gui.fullscreen, offset: list[int] = (0, 0), refresh_rate: int = 120):
+                 fullscreen: bool = cfg.gui.fullscreen, refresh_rate: int = 120):
         super().__init__(width, height, refresh_rate)
-        self.ox, self.oy = offset
         if fullscreen:
             self.root.attributes('-fullscreen', True)
-            self.width = self.root.winfo_screenwidth()
-            self.height = self.root.winfo_screenheight()
+            width = self.root.winfo_screenwidth()
+            height = self.root.winfo_screenheight()
+            self.canvas.config(width=width, height=height)
+        self.dx = width / cfg.gui.width
+        self.dy = height / cfg.gui.height
 
         self.active = True
         self.view = None
@@ -82,7 +85,6 @@ class View:
 class Sprite:
     def __init__(self, x: int, y: int, hitbox: list = None):
         self.window = get_window()
-        # self.x, self.y = x + self.window.ox, y + self.window.oy
         self.x, self.y = x, y
         if hitbox:
             self.hitbox = [(self.x + i, self.y + j) for i, j in hitbox]
@@ -96,7 +98,7 @@ class Sprite:
         pass
 
     def collides_with_point(self, x: int, y: int):
-        if (x - self.window.ox, y - self.window.oy) in self.hitbox:
+        if (x, y) in self.hitbox:
             return True
         else:
             return False
@@ -130,38 +132,38 @@ def set_window(window) -> None:
 
 
 def run():
-    window = get_window()
+    w = get_window()
     fps = list()
-    while window.active:
+    while w.active:
         start = tm.time()
-        if len(window.ev_queue):
-            ev = window.ev_queue.popleft()
+        if len(w.ev_queue):
+            ev = w.ev_queue.popleft()
             if type_ev(ev) == 'Quitte':
-                window.active = False
+                w.active = False
                 return
             elif type_ev(ev) == 'Touche':
-                window.on_key_press(touche(ev))
+                w.on_key_press(touche(ev))
             elif type_ev(ev) == 'ClicGauche':
-                window.on_mouse_press(abscisse(ev), ordonnee(ev), key='Left')
+                w.on_mouse_press(abscisse(ev) // w.dx, ordonnee(ev) // w.dy, key='Left')
             elif type_ev(ev) == 'ClicDroit':
-                window.on_mouse_press(abscisse(ev), ordonnee(ev), key='Right')
+                w.on_mouse_press(abscisse(ev) // w.dx, ordonnee(ev) // w.dy, key='Right')
 
-        window.on_update(tm.time() - window.last_update)
-        if window.view:
-            window.view.on_update(tm.time() - window.last_update)
+        w.on_update(tm.time() - w.last_update)
+        if w.view:
+            w.view.on_update(tm.time() - w.last_update)
 
-        window.canvas.delete('all')
+        w.canvas.delete('all')
 
-        window.on_draw()
-        if window.view:
-            window.view.on_draw()
+        w.on_draw()
+        if w.view:
+            w.view.on_draw()
 
-        window.root.update()
-        tm.sleep(max(0., window.interval - (tm.time() - window.last_update)))
-        window.last_update = tm.time()
+        w.root.update()
+        tm.sleep(max(0., w.interval - (tm.time() - w.last_update)))
+        w.last_update = tm.time()
 
-        if not window.active:
-            window.root.destroy()
+        if not w.active:
+            w.root.destroy()
             set_window(None)
 
         end = tm.time()
@@ -190,27 +192,28 @@ def hitbox_rect(width: int, height: int):
 def draw_line(ax: int, ay: int, bx: int, by: int,
               color: str = cfg.gui.palette.black, thickness: int = cfg.gui.thickness):
     w = get_window()
-    w.canvas.create_line(ax + w.ox, ay + w.oy, bx + w.ox, by + w.oy, fill=color, width=thickness)
+    w.canvas.create_line(ax * w.dx, ay * w.dy, bx * w.dx, by * w.dy, fill=color, width=thickness * w.dx)
 
 
 def draw_circle(x: int, y: int, radius: int = cfg.gui.radius, color: str = cfg.gui.palette.light_grey,
                 outline: str = cfg.gui.palette.black, thickness: int = cfg.gui.thickness):
     w = get_window()
-    w.canvas.create_oval(x - radius + w.ox, y - radius + w.oy, x + radius + w.ox, y + radius + w.oy,
-                         fill=color, outline=outline, width=thickness)
+    w.canvas.create_oval((x - radius) * w.dx, (y - radius) * w.dy, (x + radius) * w.dx, (y + radius) * w.dy,
+                         fill=color, outline=outline, width=thickness * w.dx)
 
 
 def draw_rect(x: int, y: int, width: int, height: int, color: str = cfg.gui.palette.light_grey,
               outline: str = cfg.gui.palette.black, thickness: int = cfg.gui.thickness):
     w = get_window()
-    w.canvas.create_rectangle(x - width//2 + w.ox, y - height//2 + w.oy, x + width//2 + w.ox, y + height//2 + w.oy,
-                              fill=color, outline=outline, width=thickness)
+    w.canvas.create_rectangle((x - width//2) * w.dx, (y - height//2) * w.dy, (x + width//2) * w.dx, (y + height//2) * w.dy,
+                              fill=color, outline=outline, width=thickness * w.dx)
 
 
 def draw_text(x: int, y: int, text: str, font_name: str = cfg.gui.font.name, font_size: int = cfg.gui.font.size,
               color: str = cfg.gui.palette.black, location: str = 'center'):
     w = get_window()
-    w.canvas.create_text(x + w.ox, y + w.oy, text=text, font=(font_name, font_size), fill=color, anchor=location)
+    w.canvas.create_text(x * w.dx, y * w.dy, text=text, font=(font_name, round(font_size * min(w.dx, w.dy))),
+                         fill=color, anchor=location)
 
 
 def get_random_color(colors: list[str] = None):

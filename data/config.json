@@ -13,8 +13,8 @@
         "port": 2310
     },
     "gui": {
-        "width": 1200,
-        "height": 675,
+        "width": 720,
+        "height": 480,
         "fullscreen": false,
         "offset": {
             "x": 0,

@@ -15,6 +15,7 @@ class Player:
 @dc.dataclass
 class Point:
     player: any(['Player', None])
+    token: str
     location: list[int]
     neighbors: list['Point']
 
