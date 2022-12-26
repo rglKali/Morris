@@ -142,7 +142,7 @@ Updates all containing sprites.
 
 >
 
-## function run() -> None
+## function run_pytk() -> None
 The heart of the PyTk library, runs the main process.
 Requires a ``Window``, created before calling this function.
 Note, that this function starts the ``while True`` cycle, and 

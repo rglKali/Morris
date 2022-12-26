@@ -12,7 +12,7 @@ __all__ = [
     'Sprite',
     'SpriteList',
     # Commands
-    'run',
+    'run_pytk',
     'get_random_color',
     'draw_line',
     'draw_circle',
@@ -131,7 +131,7 @@ def set_window(window) -> None:
     _window = window
 
 
-def run():
+def run_pytk():
     w = get_window()
     fps = list()
     while w.active:

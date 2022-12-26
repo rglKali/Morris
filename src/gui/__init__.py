@@ -1,5 +1,5 @@
-from .pytk import run, sample
+from .pytk.samples import buttons
 
 
 def gui():
-    sample.run_sample()
+    buttons.run()

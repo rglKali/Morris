@@ -3,9 +3,6 @@
 1. Created 4 Basic classes: ``Window`` and ``View``, ``Sprite`` and ``SpriteList``.
 2. Created main ``run`` function, 4 ``draw`` functions, 2 ``hitbox`` functions and 1 ``misc`` function.
 
-``PyTk Docs``: None.
-1. Not available for this version.
-
 ``PyTk Samples``: Development.
 1. Created a simple sample App, using ``Window`` and ``Sprite`` classes, ``drawing`` and ``hitbox`` functions.
 
@@ -14,7 +11,6 @@
 ``PyTk Sources``: Small fixes & refactors.
 
 1. Removed ``setup`` method for ``Window`` and ``View`` classes.
-
 2. Added ``offset`` attribute for the ``Window``. Experimental Feature. 
 
 
@@ -41,3 +37,20 @@
 2. Removed sample.py (doesn't support the new version)
 3. Added features from sample.py to sample2.py
 4. Renamed sample2.py to sample.py
+
+
+### 26.12.2022 - Beta 1.2ext
+``PyTk Sources``: Small refactor.
+1. Changed function ``run()`` to ``run_pytk()``
+
+``PyTk Docs``: Small fix.
+1. Small fix, according to the latest sources update.
+
+``Pytk Extensions``: Development.
+1. Created a separate directory for different extensions for PyTk library.
+2. Created ``buttons.py`` with ``Button``, ``CheckBox`` and ``InputField`` templates.
+
+``PyTk Samples``: Refactor & Update.
+1. Moved all the samples to a separate directory.
+2. Renamed ``sample.py`` to ``basic.py``
+3. Created ``buttons.py`` to demonstrate how to use ``buttons`` extension.
