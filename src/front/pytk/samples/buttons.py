@@ -1,19 +1,22 @@
-from .. import *
+from ... import pytk as tk
 
 
-class ColorfulButton(Button):
+__all__ = ['buttons']
+
+
+class ColorfulButton(tk.Button):
     def __init__(self):
         super().__init__(360, 360, width=200, height=50, text='Click!!')
 
     def on_click(self):
-        self.color = get_random_color()
+        self.color = tk.get_random_color()
 
 
-class Win(Window):
+class Win(tk.Window):
     def __init__(self, width, height):
         super().__init__(width, height)
-        self.input = InputField(360, 240, width=400, height=50, text='Name: ')
-        self.checkbox = CheckBox(360, 120, size=50)
+        self.input = tk.InputField(360, 240, width=400, height=50, text='Name: ')
+        self.checkbox = tk.CheckBox(360, 120, size=50)
         self.button = ColorfulButton()
 
     def on_draw(self):
@@ -37,6 +40,6 @@ class Win(Window):
         self.button.click(x, y)
 
 
-def run():
+def buttons():
     win = Win(720, 480)
-    run_pytk()
+    tk.run()

@@ -1,18 +1,23 @@
-from .fltk import CustomCanvas, type_ev, touche, abscisse, ordonnee
 import time as tm
 import random as rd
-from ... import cfg
+import dataclasses as dc
 from typing import Optional
+
+from .fltk import CustomCanvas, type_ev, touche, abscisse, ordonnee
 
 
 __all__ = [
+    # Data
+    'config',
+    'palette',
     # Classes
     'Window',
     'View',
     'Sprite',
     'SpriteList',
     # Commands
-    'run_pytk',
+    # 'get_window', Not sure, it would be useful, but it gives the possibility to get the current window
+    'run',
     'get_random_color',
     'draw_line',
     'draw_circle',
@@ -32,22 +37,55 @@ pytk is a package created by rglKali on top of the fltk library to turn it into 
 _window: Optional['Window'] = None
 
 
+@dc.dataclass
+class config:
+    dev_width = 720
+    dev_height = 480
+    font_name = 'JetBrains Mono'
+    font_size = 20
+    outline = 5
+
+
+@dc.dataclass
+class palette:
+    black = "#000000"
+    dark_blue = "#1D2B53"
+    dark_purple = "#7E2553"
+    dark_green = "#008751"
+    brown = "#AB5236"
+    dark_grey = "#5F574F"
+    light_grey = "#C2C3C7"
+    white = "#FFF1E8"
+    red = "#FF004D"
+    orange = "#FFA300"
+    yellow = "#FFEC27"
+    green = "#00E436"
+    blue = "#29ADFF"
+    lavender = "#83769C"
+    pink = "#FF77A8"
+    light_peach = "#FFCCAA"
+
+
 # Classes
 class Window(CustomCanvas):
-    def __init__(self, width: int = cfg.gui.width, height: int = cfg.gui.height,
-                 fullscreen: bool = cfg.gui.fullscreen, refresh_rate: int = 120):
+    def __init__(self, width: int = config.dev_width, height: int = config.dev_height,
+                 fullscreen: bool = False, bg: str = palette.white, refresh_rate: int = 120):
         super().__init__(width, height, refresh_rate)
+        self.bg = bg
         if fullscreen:
             self.root.attributes('-fullscreen', True)
             width = self.root.winfo_screenwidth()
             height = self.root.winfo_screenheight()
             self.canvas.config(width=width, height=height)
-        self.dx = width / cfg.gui.width
-        self.dy = height / cfg.gui.height
+        self.dx = width / config.dev_width
+        self.dy = height / config.dev_height
 
         self.active = True
         self.view = None
         set_window(self)
+
+    def draw_bg(self):
+        draw_rect(360, 240, 720, 480, self.bg, thickness=0)
 
     def on_update(self, delta_time: float):
         pass
@@ -68,6 +106,10 @@ class Window(CustomCanvas):
 class View:
     def __init__(self):
         self.window = get_window()
+        self.bg = self.window.bg
+
+    def draw_bg(self):
+        draw_rect(360, 240, 720, 480, self.bg, thickness=0)
 
     def on_update(self, delta_time: float):
         pass
@@ -131,7 +173,7 @@ def set_window(window) -> None:
     _window = window
 
 
-def run_pytk():
+def run():
     w = get_window()
     fps = list()
     while w.active:
@@ -139,14 +181,24 @@ def run_pytk():
         if len(w.ev_queue):
             ev = w.ev_queue.popleft()
             if type_ev(ev) == 'Quitte':
-                w.active = False
-                return
+                w.quit()
             elif type_ev(ev) == 'Touche':
-                w.on_key_press(touche(ev))
+                key = touche(ev)
+                w.on_key_press(key)
+                if w.view:
+                    w.on_key_press(key)
             elif type_ev(ev) == 'ClicGauche':
-                w.on_mouse_press(abscisse(ev) // w.dx, ordonnee(ev) // w.dy, key='Left')
+                x = round(abscisse(ev) / w.dx)
+                y = round(ordonnee(ev) / w.dy)
+                w.on_mouse_press(x, y, key='Left')
+                if w.view:
+                    w.view.on_mouse_press(x, y, key='Left')
             elif type_ev(ev) == 'ClicDroit':
-                w.on_mouse_press(abscisse(ev) // w.dx, ordonnee(ev) // w.dy, key='Right')
+                x = round(abscisse(ev) / w.dx)
+                y = round(ordonnee(ev) / w.dy)
+                w.on_mouse_press(x, y, key='Right')
+                if w.view:
+                    w.view.on_mouse_press(x, y, key='Right')
 
         w.on_update(tm.time() - w.last_update)
         if w.view:
@@ -154,8 +206,10 @@ def run_pytk():
 
         w.canvas.delete('all')
 
+        w.draw_bg()
         w.on_draw()
         if w.view:
+            w.view.draw_bg()
             w.view.on_draw()
 
         w.root.update()
@@ -170,6 +224,13 @@ def run_pytk():
         fps.append(end - start)
 
     print(f'Average FPS: {round(len(fps)/sum(fps), 2)}')
+
+
+def get_random_color(colors: list[str] = None):
+    if colors:
+        return rd.choice(colors)
+    else:
+        return rd.choice([color for color in vars(palette).values() if isinstance(color, str) and color[0] == '#'])
 
 
 def hitbox_circle(radius: int):
@@ -190,34 +251,28 @@ def hitbox_rect(width: int, height: int):
 
 
 def draw_line(ax: int, ay: int, bx: int, by: int,
-              color: str = cfg.gui.palette.black, thickness: int = cfg.gui.thickness):
+              color: str = palette.black, thickness: int = config.outline):
     w = get_window()
-    w.canvas.create_line(ax * w.dx, ay * w.dy, bx * w.dx, by * w.dy, fill=color, width=thickness * w.dx)
+    w.canvas.create_line(ax * w.dx, ay * w.dy, bx * w.dx, by * w.dy, fill=color, width=thickness * min(w.dx, w.dy))
 
 
-def draw_circle(x: int, y: int, radius: int = cfg.gui.radius, color: str = cfg.gui.palette.light_grey,
-                outline: str = cfg.gui.palette.black, thickness: int = cfg.gui.thickness):
+def draw_circle(x: int, y: int, radius: int, color: str = get_random_color(),
+                outline: str = palette.black, thickness: int = config.outline):
     w = get_window()
     w.canvas.create_oval((x - radius) * w.dx, (y - radius) * w.dy, (x + radius) * w.dx, (y + radius) * w.dy,
-                         fill=color, outline=outline, width=thickness * w.dx)
+                         fill=color, outline=outline, width=thickness * min(w.dx, w.dy))
 
 
-def draw_rect(x: int, y: int, width: int, height: int, color: str = cfg.gui.palette.light_grey,
-              outline: str = cfg.gui.palette.black, thickness: int = cfg.gui.thickness):
+def draw_rect(x: int, y: int, width: int, height: int, color: str = palette.light_grey,
+              outline: str = palette.black, thickness: int = config.outline):
     w = get_window()
-    w.canvas.create_rectangle((x - width//2) * w.dx, (y - height//2) * w.dy, (x + width//2) * w.dx, (y + height//2) * w.dy,
-                              fill=color, outline=outline, width=thickness * w.dx)
+    w.canvas.create_rectangle((x - width//2) * w.dx, (y - height//2) * w.dy,
+                              (x + width//2) * w.dx, (y + height//2) * w.dy,
+                              fill=color, outline=outline, width=thickness * min(w.dx, w.dy))
 
 
-def draw_text(x: int, y: int, text: str, font_name: str = cfg.gui.font.name, font_size: int = cfg.gui.font.size,
-              color: str = cfg.gui.palette.black, location: str = 'center'):
+def draw_text(x: int, y: int, text: str, font_name: str = config.font_name, font_size: int = config.font_size,
+              color: str = palette.black, location: str = 'center'):
     w = get_window()
     w.canvas.create_text(x * w.dx, y * w.dy, text=text, font=(font_name, round(font_size * min(w.dx, w.dy))),
                          fill=color, anchor=location)
-
-
-def get_random_color(colors: list[str] = None):
-    if colors:
-        return rd.choice(colors)
-    else:
-        return rd.choice(list(vars(cfg.gui.palette).values()))

@@ -54,3 +54,15 @@
 1. Moved all the samples to a separate directory.
 2. Renamed ``sample.py`` to ``basic.py``
 3. Created ``buttons.py`` to demonstrate how to use ``buttons`` extension.
+
+
+### 29.12.2022 - Release 1.4
+``PyTk Sources``: Major update & refactor.
+1. Included config files to PyTk and updated all the necessary sources.
+2. The library now can work without any extra files, fully automatically.
+
+``PyTK Docs``: No changes.
+
+``PyTk Extensions``: No changes
+
+``PyTk Samples``: No changes.

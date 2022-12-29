@@ -1,11 +1,12 @@
 ### Python template
 
+# Test Files
+test.py
+__old/
+*.png
+
 # Jetbrains IDE
 .idea/
-
-# Test & old files
-__old/
-test.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

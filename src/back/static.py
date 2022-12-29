@@ -1,5 +1,19 @@
 import dataclasses as dc
 
+__all__ = [
+    'Player',
+    'Point',
+    'Board'
+]
+
+
+@dc.dataclass
+class Action:
+    player: 'Player'
+    action: any(['move', 'set', 'remove'])
+    from_point: 'Point'
+    to_point: 'Point'
+
 
 @dc.dataclass
 class Player:
@@ -9,14 +23,15 @@ class Player:
     move: any([int, None])
     pieces: int
     phase: int
-    history: list
+    history: list[Action]
 
 
 @dc.dataclass
 class Point:
     player: any(['Player', None])
-    token: str
-    location: list[int]
+    name: str
+    x: int
+    y: int
     neighbors: list['Point']
 
 
@@ -24,8 +39,8 @@ class Point:
 class Board:
     name: str
     size: int
-    move: float
-    game: float
+    move: any([int, None])
+    game: any([int, None])
     points: list['Point']
     pieces: int
     unite: bool
