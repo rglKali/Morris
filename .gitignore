@@ -1,9 +1,11 @@
 ### Python template
 
 # Test Files
-test.py
+./test.py
 __old/
+*.zip
 *.png
+*.ogg
 
 # Jetbrains IDE
 .idea/
