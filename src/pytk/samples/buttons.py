@@ -1,9 +1,6 @@
 from ... import pytk as tk
 
 
-__all__ = ['buttons']
-
-
 class ColorfulButton(tk.Button):
     def __init__(self):
         super().__init__(360, 360, width=200, height=50, text='Click!!')

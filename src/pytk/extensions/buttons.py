@@ -1,4 +1,6 @@
 from time import time
+import string
+
 
 from ..pytk import config, palette, Sprite, hitbox_rect, draw_rect, draw_line, draw_text
 
@@ -6,32 +8,30 @@ from ..pytk import config, palette, Sprite, hitbox_rect, draw_rect, draw_line, d
 __all__ = [
     'Button',
     'CheckBox',
-    'InputField'
+    'InputField',
+    'Slider'        # May cause issues, still in development
 ]
 
 
 class Button(Sprite):
     def __init__(self, x: int, y: int, width: int, height: int, text: str = str(),
-                 color: str = palette.white, action=None):
+                 color: str = palette.white):
         super().__init__(x, y, hitbox=hitbox_rect(width, height))
         self.color = color
         self.width = width
         self.height = height
         self.text = text
-        if action:
-            self.action = action
 
     def draw(self):
         draw_rect(self.x, self.y, self.width, self.height, color=self.color, thickness=config.outline)
         draw_text(self.x, self.y, self.text)
 
     def click(self, x: int, y: int):
-        if (x, y) in self.hitbox:
+        if self.collides_with_point(x, y):
             self.on_click()
 
     def on_click(self):
-        # Here should be some action, if you want to subclass.
-        self.action(self)
+        pass
 
 
 class CheckBox(Sprite):
@@ -72,18 +72,24 @@ class CheckBox(Sprite):
 
 class InputField(Sprite):
     def __init__(self, x: int, y: int, width: int, height: int, text: str, color: str = palette.white,
-                 allowed_chars: str = ' azertyuiopqsdfghjklmwxcvbn1234567890AZERTYUIOPQSDFGHJKLMWXCVBN',
-                 max_length: int = 12):
+                 allowed_chars: str = string.printable,
+                 max_length: int = 12, default: str = str()):
         super().__init__(x, y, hitbox=hitbox_rect(width, height))
         self.color = color
         self.width = width
         self.height = height
         self.text = text
-        self.value = str()
+        self.value = default
         self.chars = allowed_chars
         self.length = max_length
         self.selected = False
-        self.selector = int()
+        self.selector = len(self)
+
+    def __len__(self):
+        return len(self.value)
+
+    def __int__(self):
+        return int(self.value)
 
     def __str__(self):
         return self.value
@@ -100,16 +106,18 @@ class InputField(Sprite):
             draw_text(self.x, self.y, self.text + text)
 
     def click(self, x: int, y: int):
-        if (x, y) in self.hitbox:
+        if self.collides_with_point(x, y):
             self.selected = True
         else:
             self.selected = False
 
     def move_selector_right(self):
-        self.selector += 1
+        if self.selected and self.selector < len(self.value):
+            self.selector += 1
 
     def move_selector_left(self):
-        self.selector -= 1
+        if self.selected and self.selector > 0:
+            self.selector -= 1
 
     def remove_char(self):
         if self.selected and self.selector > 0:
@@ -128,3 +136,29 @@ class InputField(Sprite):
             lst.insert(self.selector, char)
             self.value = ''.join(lst)
             self.selector += 1
+
+
+class Slider(Sprite):
+    def __init__(self, x: int, y: int, width: int, height: int, values: list):
+        super().__init__(x, y, hitbox=hitbox_rect(width, height))
+        self.width = width
+        self.height = height
+        self.values = values
+        self.selected = True
+        self.selector = 0
+
+    def __float__(self):
+        return self.values[self.selector]
+
+    def move_right(self):
+        if self.selected and self.selector < len(self.values) - 1:
+            self.selector += 1
+
+    def move_left(self):
+        if self.selected and self.selector > 0:
+            self.selector -= 1
+
+    def draw(self):
+        draw_rect(self.x, self.y, self.width, self.height)
+        draw_line(round(self.x - self.width * 0.4), self.y, round(self.x + self.width * 0.4), self.y)
+        draw_rect(self.x + round(self.selector * self.width * 0.1), self.y, round(self.width * 0.1), round(self.height * 0.7))

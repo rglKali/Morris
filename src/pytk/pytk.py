@@ -10,28 +10,23 @@ __all__ = [
     # Data
     'config',
     'palette',
+
     # Classes
     'Window',
     'View',
     'Sprite',
     'SpriteList',
+
     # Commands
-    # 'get_window', Not sure, it would be useful, but it gives the possibility to get the current window
-    'run',
     'get_random_color',
     'draw_line',
     'draw_circle',
     'draw_rect',
     'draw_text',
     'hitbox_rect',
-    'hitbox_circle'
+    'hitbox_circle',
+    'run'
 ]
-__version__ = 1.1
-__license__ = 'MIT'
-
-"""
-pytk is a package created by rglKali on top of the fltk library to turn it into an OOP library
-"""
 
 
 _window: Optional['Window'] = None
@@ -72,17 +67,25 @@ class Window(CustomCanvas):
                  fullscreen: bool = False, bg: str = palette.white, refresh_rate: int = 120):
         super().__init__(width, height, refresh_rate)
         self.bg = bg
-        if fullscreen:
-            self.root.attributes('-fullscreen', True)
-            width = self.root.winfo_screenwidth()
-            height = self.root.winfo_screenheight()
-            self.canvas.config(width=width, height=height)
-        self.dx = width / config.dev_width
-        self.dy = height / config.dev_height
+
+        self.dx = float()
+        self.dy = float()
+        self.resize(width, height, fullscreen)
 
         self.active = True
         self.view = None
         set_window(self)
+
+    def resize(self, width: int = None, height: int = None, fullscreen: bool = None):
+        self.root.attributes('-fullscreen', fullscreen)
+
+        if fullscreen:
+            width = self.root.winfo_screenwidth()
+            height = self.root.winfo_screenheight()
+
+        self.canvas.config(width=width, height=height)
+        self.dx = width / config.dev_width
+        self.dy = height / config.dev_height
 
     def draw_bg(self):
         draw_rect(360, 240, 720, 480, self.bg, thickness=0)
@@ -125,7 +128,7 @@ class View:
 
 
 class Sprite:
-    def __init__(self, x: int, y: int, hitbox: list = None):
+    def __init__(self, x: int = None, y: int = None, hitbox: list = None):
         self.window = get_window()
         self.x, self.y = x, y
         if hitbox:
@@ -150,7 +153,7 @@ class SpriteList(list):
     def __init__(self, *sprites):
         super().__init__(sprites)
 
-    def update(self):
+    def update(self, *args):
         [sprite.update() for sprite in self]
 
     def draw(self):
@@ -171,59 +174,6 @@ def get_window() -> 'Window':
 def set_window(window) -> None:
     global _window
     _window = window
-
-
-def run():
-    w = get_window()
-    fps = list()
-    while w.active:
-        start = tm.time()
-        if len(w.ev_queue):
-            ev = w.ev_queue.popleft()
-            if type_ev(ev) == 'Quitte':
-                w.quit()
-            elif type_ev(ev) == 'Touche':
-                key = touche(ev)
-                w.on_key_press(key)
-                if w.view:
-                    w.on_key_press(key)
-            elif type_ev(ev) == 'ClicGauche':
-                x = round(abscisse(ev) / w.dx)
-                y = round(ordonnee(ev) / w.dy)
-                w.on_mouse_press(x, y, key='Left')
-                if w.view:
-                    w.view.on_mouse_press(x, y, key='Left')
-            elif type_ev(ev) == 'ClicDroit':
-                x = round(abscisse(ev) / w.dx)
-                y = round(ordonnee(ev) / w.dy)
-                w.on_mouse_press(x, y, key='Right')
-                if w.view:
-                    w.view.on_mouse_press(x, y, key='Right')
-
-        w.on_update(tm.time() - w.last_update)
-        if w.view:
-            w.view.on_update(tm.time() - w.last_update)
-
-        w.canvas.delete('all')
-
-        w.draw_bg()
-        w.on_draw()
-        if w.view:
-            w.view.draw_bg()
-            w.view.on_draw()
-
-        w.root.update()
-        tm.sleep(max(0., w.interval - (tm.time() - w.last_update)))
-        w.last_update = tm.time()
-
-        if not w.active:
-            w.root.destroy()
-            set_window(None)
-
-        end = tm.time()
-        fps.append(end - start)
-
-    print(f'Average FPS: {round(len(fps)/sum(fps), 2)}')
 
 
 def get_random_color(colors: list[str] = None):
@@ -276,3 +226,61 @@ def draw_text(x: int, y: int, text: str, font_name: str = config.font_name, font
     w = get_window()
     w.canvas.create_text(x * w.dx, y * w.dy, text=text, font=(font_name, round(font_size * min(w.dx, w.dy))),
                          fill=color, anchor=location)
+
+
+def run():
+    w = get_window()
+    fps = list()
+    while w.active:
+        start = tm.time()
+
+        if len(w.ev_queue):
+            ev = w.ev_queue.popleft()
+
+            if type_ev(ev) == 'Quitte':
+                w.quit()
+
+            elif type_ev(ev) == 'Touche':
+                key = touche(ev)
+                w.on_key_press(key)
+                if w.view:
+                    w.view.on_key_press(key)
+
+            elif type_ev(ev) == 'ClicGauche':
+                x = round(abscisse(ev) / w.dx)
+                y = round(ordonnee(ev) / w.dy)
+                w.on_mouse_press(x, y, key='Left')
+                if w.view:
+                    w.view.on_mouse_press(x, y, key='Left')
+
+            elif type_ev(ev) == 'ClicDroit':
+                x = round(abscisse(ev) / w.dx)
+                y = round(ordonnee(ev) / w.dy)
+                w.on_mouse_press(x, y, key='Right')
+                if w.view:
+                    w.view.on_mouse_press(x, y, key='Right')
+
+        w.on_update(tm.time() - w.last_update)
+        if w.view:
+            w.view.on_update(tm.time() - w.last_update)
+
+        w.canvas.delete('all')
+
+        w.draw_bg()
+        w.on_draw()
+        if w.view:
+            w.view.draw_bg()
+            w.view.on_draw()
+
+        w.root.update()
+        tm.sleep(max(0., w.interval - (tm.time() - w.last_update)))
+        w.last_update = tm.time()
+
+        if not w.active:
+            w.root.destroy()
+            set_window(None)
+
+        end = tm.time()
+        fps.append(end - start)
+
+    print(f'Average FPS: {round(len(fps)/sum(fps), 2)}')

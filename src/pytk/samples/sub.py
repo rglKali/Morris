@@ -1,9 +1,6 @@
 from ... import pytk as tk
 
 
-__all__ = ['sub']
-
-
 # You can subclass Buttons
 class Subclass(tk.Button):
     def __init__(self):

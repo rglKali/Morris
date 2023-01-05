@@ -1,5 +1,15 @@
 [
   {
-
+    "timestamp": null,
+    "board": "Board data",
+    "player": "Player info",
+    "history": [
+      {
+        "player": null,
+        "from_point": null,
+        "to_point": null
+      },
+      "..."
+    ]
   }
 ]

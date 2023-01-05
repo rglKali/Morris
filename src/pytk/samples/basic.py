@@ -1,13 +1,10 @@
 from ... import pytk as tk
 
 
-__all__ = ['basic']
-
-
 class Button(tk.Sprite):
     def __init__(self, x: int, y: int, width: int, height: int):
         super().__init__(x, y, hitbox=tk.hitbox_rect(width, height))
-        self.color = 'white'
+        self.color = tk.palette.white
         self.width = width
         self.height = height
 
@@ -27,7 +24,7 @@ class MagicCircle(tk.Sprite):
 
     def draw(self):
         if self.radius < 30:
-            tk.draw_circle(self.x, self.y, self.radius, color='white', thickness=2)
+            tk.draw_circle(self.x, self.y, self.radius, color=tk.palette.blue, thickness=2)
 
 
 class Win(tk.Window):
