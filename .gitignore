@@ -6,6 +6,8 @@ __old/
 *.zip
 *.png
 *.ogg
+*.txt
+*.url
 
 # Jetbrains IDE
 .idea/
