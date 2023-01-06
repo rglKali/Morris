@@ -1,5 +1,4 @@
 from . import pytk as tk
-from .menu import Menu
 
 
 class Window(tk.Window):
@@ -14,6 +13,7 @@ class Window(tk.Window):
 
     def __init__(self):
         super().__init__(width=self.width, height=self.height, fullscreen=self.fullscreen)
+        from .menu import Menu
         self.view = Menu()
 
 

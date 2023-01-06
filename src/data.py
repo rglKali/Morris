@@ -1,11 +1,13 @@
 import random
 import string
 
+__all__ = ['Point', 'Board', 'Player', 'Action']
+
 
 class lang:
-    move = {'EN': 'Move', 'FR': ''}
-    remove = {'EN': 'Remove', 'FR': ''}
-    place = {'EN': 'Place', 'FR': ''}
+    move = {'EN': 'Move', 'FR': 'Déplacer'}
+    remove = {'EN': 'Remove', 'FR': 'Retirer'}
+    place = {'EN': 'Place', 'FR': 'Placer'}
 
 
 class Point:
@@ -56,7 +58,7 @@ class Board:
 class Player:
     def __init__(self, data: dict = None):
         self.name = data['nickname'] if (isinstance(data, dict) and 'nickname' in data.keys()) else \
-            'Player ' + ''.join([random.choice(string.digits) for _ in range(6)])
+            'User' + ''.join([random.choice(string.digits) for _ in range(6)])
 
 
 class Action:

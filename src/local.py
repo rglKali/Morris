@@ -7,8 +7,8 @@ __all__ = ['Local']
 
 
 class lang:
-    create = {'EN': 'Create my lobby', 'FR': ''}
-    menu = {'EN': 'Return to menu', 'FR': ''}
+    create = {'EN': 'Create my lobby', 'FR': 'Créer mon lobby'}
+    menu = {'EN': 'Return to menu', 'FR': 'Retourner au menu'}
 
 
 class NetworkGame(tk.Sprite):

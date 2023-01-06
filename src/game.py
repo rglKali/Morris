@@ -1,12 +1,13 @@
 import string
 import random
-
 from . import pytk as tk
 from .data import Board, Player, Point, Action
 
+__all__ = ['Game']
+
 
 class lang:
-    give_up = {'EN': 'Give Up!', 'FR': ''}
+    give_up = {'EN': 'Give Up!', 'FR': 'Abandonner!'}
 
 
 class GAction(tk.Sprite):
@@ -48,13 +49,14 @@ class GPlayer(tk.Sprite):
 
     def draw(self):
         tk.draw_circle(self.x, self.y, self.radius, self.color)
+        tk.draw_text(self.x, self.y, str(self.badges))
 
 
 class GPoint(tk.Sprite):
     def __init__(self, data: 'Point', delta):
         self.radius = 15
-        x = 230 + data.x * delta
-        y = 190 + data.y * delta
+        x = 230 + round(data.x * delta)
+        y = 190 + round(data.y * delta)
         super().__init__(x=x, y=y, hitbox=tk.hitbox_circle(self.radius))
         self.data = data
 
@@ -189,11 +191,17 @@ class Game(tk.View):
         if player is None:
             return
         elif to_point is not None:
-            for neighbor in to_point.neighbors:
+            for ind, neighbor in enumerate(to_point.neighbors):
                 for mill in neighbor.neighbors:
                     if mill != to_point and mill.player == neighbor.player == to_point.player and \
                             mill.x - neighbor.x == neighbor.x - to_point.x and \
                             mill.y - neighbor.y == neighbor.y - to_point.y:
+                        self.active_player.mill = True
+                        return
+                for mill in to_point.neighbors[:ind]:
+                    if mill != neighbor and mill.player == neighbor.player == to_point.player and \
+                            mill.x - to_point.x == to_point.x - neighbor.x and \
+                            mill.y - to_point.y == to_point.y - neighbor.y:
                         self.active_player.mill = True
                         return
         else:
@@ -216,6 +224,7 @@ class Game(tk.View):
 
     def on_draw(self):
         self.board.draw()
+        self.opposite().draw()
         self.active_player.draw()
         self.give_up.draw()
         if self.window.features:

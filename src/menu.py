@@ -1,13 +1,12 @@
 from . import pytk as tk
 
-
 __all__ = ['Menu']
 
 
 class lang:
-    nickname = {'EN': 'Nickname', 'FR': ''}
-    play = {'EN': 'Play Morris', 'FR': ''}
-    quit = {'EN': 'Quit Game', 'FR': ''}
+    nickname = {'EN': 'Nickname', 'FR': 'Surnom'}
+    play = {'EN': 'Play Morris', 'FR': 'Jeu du Moulin'}
+    quit = {'EN': 'Quit Game', 'FR': 'Quitter le Jeu'}
 
 
 class Quit(tk.Button):

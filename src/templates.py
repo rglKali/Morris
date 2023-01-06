@@ -8,14 +8,14 @@ __all__ = ['Choice']
 
 
 class lang:
-    badges = {'EN': 'Badges', 'FR': ''}
-    unite = {'EN': 'Unite', 'FR': ''}
-    skip = {'EN': 'Skip', 'FR': ''}
-    play = {'EN': 'Play selected', 'FR': ''}
-    delete = {'EN': 'Delete selected', 'FR': ''}
-    lan = {'EN': 'Return to LAN games', 'FR': ''}
-    menu = {'EN': 'Return to main menu', 'FR': ''}
-    editor = {'EN': 'Create my template', 'FR': ''}
+    badges = {'EN': 'Badges', 'FR': 'Pions'}
+    unite = {'EN': 'Unite', 'FR': 'Réunir'}
+    skip = {'EN': 'Skip', 'FR': 'Sauter'}
+    play = {'EN': 'Play selected', 'FR': 'Jouer la sélection'}
+    delete = {'EN': 'Delete selected', 'FR': 'Supprimer la sélection'}
+    lan = {'EN': 'Return to LAN games', 'FR': 'Revenir aux parties locales'}
+    menu = {'EN': 'Return to main menu', 'FR': 'Revenir au menu principal'}
+    editor = {'EN': 'Create my template', 'FR': 'Créer mon modèle'}
 
 
 class Template(tk.Button):

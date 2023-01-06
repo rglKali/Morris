@@ -3,19 +3,18 @@ import json
 
 from . import pytk as tk
 
-
 __all__ = ['Editor']
 
 
 class lang:
-    size = {'EN': 'Size', 'FR': ''}
-    unite = {'EN': 'Unite', 'FR': ''}
-    skip = {'EN': 'Skip', 'FR': ''}
-    name = {'EN': 'Name', 'FR': ''}
-    badges = {'EN': 'Badges amount', 'FR': ''}
-    ret = {'EN': 'Return to templates', 'FR': ''}
-    confirm = {'EN': 'Confirm', 'FR': ''}
-    save = {'EN': 'Save', 'FR': ''}
+    size = {'EN': 'Size', 'FR': 'Taille'}
+    unite = {'EN': 'Unite', 'FR': 'Unir'}
+    skip = {'EN': 'Skip', 'FR': 'Sauter'}
+    name = {'EN': 'Name', 'FR': 'Nom'}
+    badges = {'EN': 'Badges amount', 'FR': 'Nombre de pions'}
+    ret = {'EN': 'Return to templates', 'FR': 'Retourner aux modèles'}
+    confirm = {'EN': 'Confirm', 'FR': 'Confirmer'}
+    save = {'EN': 'Save', 'FR': 'Sauvegarder'}
 
 
 class Size(tk.SpriteList):
