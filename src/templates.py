@@ -1,7 +1,7 @@
 import json
 
 from . import pytk as tk
-from .data import Board
+from .data import Board, Player
 
 
 __all__ = ['Choice']
@@ -58,7 +58,7 @@ class Template(tk.Button):
             self.window.view = Lobby(self.board)
         else:
             from .game import Game
-            self.window.view = Game(self.board)
+            self.window.view = Game(self.board, [Player()])
 
 
 class Templates(tk.SpriteList):

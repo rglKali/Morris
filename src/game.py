@@ -1,17 +1,21 @@
+import string
+import random
+
 from . import pytk as tk
-from .data import Board, Player, Point
+from .data import Board, Player, Point, Action
 
 
-class Action(tk.Sprite):
-    def __init__(self, order: int, player: 'Player', from_point: 'Point' = None, to_point: 'Point' = None):
+class lang:
+    give_up = {'EN': 'Give Up!', 'FR': ''}
+
+
+class GAction(tk.Sprite):
+    def __init__(self, data: 'Action', order: int):
         super().__init__()
         self.order = order
-        if from_point is not None and to_point is not None:
-            self.text = f'{player.name}, move badge: {from_point.name} -> {to_point.name}'
-        elif from_point is not None:
-            self.text = f'{player.name}, new badge: {to_point.name}'
-        elif to_point is not None:
-            self.text = f'{player.name}, remove badge: {from_point.name}'
+        self.data = data
+        self.text = f'[{self.data.player}] {self.data.action}: ' \
+                    f'{self.data.from_point.name}, {self.data.to_point.name}'
 
     def draw(self):
         tk.draw_text(0, self.order, self.text, font_size=10, location='nw')
@@ -22,33 +26,197 @@ class History(tk.SpriteList):
         super().__init__()
 
     def draw(self):
-        tk.draw_rect(590, 240, 240, 460)
+        tk.draw_rect(610, 240, 200, 460)
         super().draw()
 
 
-class GPoint(tk.Sprite):
-    def __init__(self, data: 'Point'):
-        super().__init__()
+class GPlayer(tk.Sprite):
+    def __init__(self, data: 'Player', color: str = None):
+        self.radius = 15
+        super().__init__(30, 390, hitbox=tk.hitbox_circle(self.radius))
         self.data = data
+        self.badges = None
+        self.phase = 1
+        self.mill = False
+        self.color = color if color else random.choice([tk.palette.brown, tk.palette.orange, tk.palette.blue,
+                                                        tk.palette.white, tk.palette.pink, tk.palette.lavender])
+
+    def click(self, x, y):
+        if self.collides_with_point(x, y):
+            self.color = random.choice([tk.palette.brown, tk.palette.orange, tk.palette.blue,
+                                        tk.palette.white, tk.palette.pink, tk.palette.lavender])
+
+    def draw(self):
+        tk.draw_circle(self.x, self.y, self.radius, self.color)
+
+
+class GPoint(tk.Sprite):
+    def __init__(self, data: 'Point', delta):
+        self.radius = 15
+        x = 230 + data.x * delta
+        y = 190 + data.y * delta
+        super().__init__(x=x, y=y, hitbox=tk.hitbox_circle(self.radius))
+        self.data = data
+
+    def bind(self):
+        tk.draw_circle(self.x, self.y, self.radius, color=tk.palette.green)
+
+    def avl(self):
+        tk.draw_circle(self.x, self.y, self.radius, color=tk.palette.yellow)
+
+    def draw(self):
+        if not self.data.player:
+            tk.draw_circle(self.x, self.y, self.radius, color=tk.palette.light_peach)
+        else:
+            tk.draw_circle(self.x, self.y, self.radius, color=self.data.player.color)
 
 
 class GBoard(tk.SpriteList):
     def __init__(self, data: 'Board'):
         super().__init__()
         self.data = data
-        self.delta = None
+        self.delta = 360 / self.data.size
+        self._ascii = string.ascii_lowercase[:self.data.size]
+        self._digits = string.digits[1:self.data.size + 1]
+
+        for point in self.data.points:
+            self.append(GPoint(point, self.delta))
+
+        self.bind = None
+
+    def _get_point(self, x, y):
+        for point in self:
+            if point.collides_with_point(x, y):
+                return point
+        return None
+
+    def amount(self, player: 'GPlayer'):
+        k = 0
+        for point in self:
+            if point.data.player == player:
+                k += 1
+        return k
+
+    def click(self, x, y, player: 'GPlayer'):
+        point = self._get_point(x, y)
+        if point is None:
+            pass
+        elif player.mill and point.data.player is not None and point.data.player != player:
+            point.data.player = None
+            return player, point.data, None
+        elif point.data.player == player:
+            if not (player.phase == 1 and not self.data.unite):
+                self.bind = point
+        elif point.data.player is None:
+            if self.bind is not None:
+                if point == self.bind:
+                    pass
+                elif (player.phase == 2 or (player.phase == 1 and self.data.unite) and
+                      self.bind.data in point.data.neighbors) or player.phase == 3:
+                    self.bind.data.player = None
+                    point.data.player = player
+                    b, self.bind = self.bind, None
+                    return player, b.data, point.data
+            elif player.phase == 1:
+                point.data.player = player
+                player.badges -= 1
+                return player, None, point.data
+
+        return None, None, None
 
     def draw(self):
-        pass
+        tk.draw_rect(210, 210, 400, 400)
+
+        tk.draw_line(50, 10, 50, 410)
+        tk.draw_line(10, 370, 410, 370)
+
+        for ind, x in enumerate(self._ascii):
+            tk.draw_text(50 + (ind + 0.5) * self.delta, 390, x)
+        for ind, y in enumerate(self._digits):
+            tk.draw_text(30, 10 + (ind + 0.5) * self.delta, y)
+
+        for ind, point in enumerate(self):
+            for neighbor in self[:ind]:
+                if neighbor.data in point.data.neighbors:
+                    tk.draw_line(point.x, point.y, neighbor.x, neighbor.y)
+
+        super().draw()
+
+        if self.bind:
+            self.bind.bind()
+
+
+class GiveUp(tk.Button):
+    def on_click(self):
+        v = self.window.view
+        from .over import Over
+        self.window.view = Over(v.active_player)
 
 
 class Game(tk.View):
-    def __init__(self, board: 'Board', players:list['Player'] = None):
+    def __init__(self, board: 'Board', players: list['Player']):
         super().__init__()
+        self.give_up = GiveUp(110, 450, 200, 50, 'Give Up', color=tk.palette.red)
         self.board = GBoard(board)
+        self.players = [GPlayer(player) for player in players]
+
+        if len(self.players) < 2:
+            self.players.append(GPlayer(Player()))
+
+        for player in self.players:
+            player.badges = self.board.data.badges
+
+        self.active_player = self.players[0]
+
         if self.window.features:
             self.history = History()
 
+    def opposite(self, player=None):
+        if player is not None:
+            return self.players[0] if self.players[1] == player else self.players[1]
+        else:
+            return self.players[0] if self.players[1] == self.active_player else self.players[1]
+
+    def on_key_press(self, key: str):
+        if key == 'Escape':
+            self.give_up.on_click()
+
+    def on_mouse_press(self, x: int, y: int, key):
+        self.active_player.click(x, y)
+        self.give_up.click(x, y)
+
+        player, from_point, to_point = self.board.click(x, y, self.active_player)
+        if player is None:
+            return
+        elif to_point is not None:
+            for neighbor in to_point.neighbors:
+                for mill in neighbor.neighbors:
+                    if mill != to_point and mill.player == neighbor.player == to_point.player and \
+                            mill.x - neighbor.x == neighbor.x - to_point.x and \
+                            mill.y - neighbor.y == neighbor.y - to_point.y:
+                        self.active_player.mill = True
+                        return
+        else:
+            self.active_player.mill = False
+
+        if player.phase == 1 and player.badges == 0:
+            player.phase = 2
+        elif player.phase == 2 and self.board.amount(player) == 3 and not self.board.data.skip:
+            player.phase = 3
+
+        for player in self.players:
+            if self.board.amount(player) == 2 and player.phase != 1:
+                from .over import Over
+                self.window.view = Over(self.opposite(player))
+
+        if self.window.features:
+            self.history.append(GAction(Action({'player': player, 'from_point': from_point, 'to_point': to_point}),
+                                        order=len(self.history)))
+        self.active_player = self.opposite()
+
     def on_draw(self):
+        self.board.draw()
+        self.active_player.draw()
+        self.give_up.draw()
         if self.window.features:
             self.history.draw()

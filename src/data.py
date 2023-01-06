@@ -1,13 +1,18 @@
+import random
 import string
 
-from . import pytk as tk
+
+class lang:
+    move = {'EN': 'Move', 'FR': ''}
+    remove = {'EN': 'Remove', 'FR': ''}
+    place = {'EN': 'Place', 'FR': ''}
 
 
 class Point:
-    def __init__(self, name: str):
-        self.name = name
-        self.x = string.ascii_lowercase.index(name[0])
-        self.y = string.digits[1:].index(name[1])
+    def __init__(self, data: str):
+        self.name = data
+        self.x = string.ascii_lowercase.index(data[0])
+        self.y = string.digits[1:].index(data[1])
         self.player = None
         self.neighbors = list()
 
@@ -49,6 +54,19 @@ class Board:
 
 
 class Player:
-    def __init__(self, nickname: str, data: dict):
-        self.name = nickname
-        self.badges = None
+    def __init__(self, data: dict = None):
+        self.name = data['nickname'] if (isinstance(data, dict) and 'nickname' in data.keys()) else \
+            'Player ' + ''.join([random.choice(string.digits) for _ in range(6)])
+
+
+class Action:
+    def __init__(self, data: dict):
+        self.player = data['player']
+        self.from_point = data['from_point']
+        self.to_point = data['to_point']
+        if self.to_point is None:
+            self.action = lang.remove
+        elif self.from_point is None:
+            self.action = lang.place
+        else:
+            self.action = lang.move
