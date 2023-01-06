@@ -25,6 +25,16 @@ class Play(tk.Button):
             self.window.view = Choice()
 
 
+class Lang(tk.Button):
+    def on_click(self):
+        self.window.lang = 'FR' if self.window.lang == 'EN' else 'EN'
+        self.text = self.window.lang
+        self.window.view.play.text = lang.play[self.window.lang]
+        self.window.view.quit.text = lang.quit[self.window.lang]
+        if self.window.features:
+            self.window.view.nickname.text = f'{lang.nickname[self.window.lang]}: '
+
+
 class Menu(tk.View):
     def __init__(self):
         super().__init__()
@@ -33,12 +43,14 @@ class Menu(tk.View):
                                           color=tk.palette.light_peach, max_length=12, default=self.window.nickname)
         self.play = Play(x=360, y=250, width=200, height=50, text=lang.play[self.window.lang], color=tk.palette.yellow)
         self.quit = Quit(x=360, y=350, width=200, height=50, text=lang.quit[self.window.lang], color=tk.palette.red)
+        self.lang = Lang(x=40, y=440, width=50, height=50, text=self.window.lang, color=tk.palette.blue)
 
     def on_draw(self):
         if self.window.features:
             self.nickname.draw()
         self.play.draw()
         self.quit.draw()
+        self.lang.draw()
 
     def on_key_press(self, key: str):
         if key == 'Escape':
@@ -64,3 +76,4 @@ class Menu(tk.View):
         else:
             self.play.click(x, y)
         self.quit.click(x, y)
+        self.lang.click(x, y)

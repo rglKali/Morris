@@ -156,7 +156,7 @@ class GiveUp(tk.Button):
 class Game(tk.View):
     def __init__(self, board: 'Board', players: list['Player']):
         super().__init__()
-        self.give_up = GiveUp(110, 450, 200, 50, 'Give Up', color=tk.palette.red)
+        self.give_up = GiveUp(110, 450, 200, 50, lang.give_up[self.window.lang], color=tk.palette.red)
         self.board = GBoard(board)
         self.players = [GPlayer(player) for player in players]
 
