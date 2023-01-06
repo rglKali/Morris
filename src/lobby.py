@@ -7,4 +7,4 @@ class Lobby(tk.View):
         super().__init__()
 
     def on_draw(self):
-        tk.draw_text(360, 240, 'Dev')
+        tk.draw_text(360, 240, 'Lobby')

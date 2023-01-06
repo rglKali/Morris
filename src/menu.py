@@ -4,6 +4,12 @@ from . import pytk as tk
 __all__ = ['Menu']
 
 
+class lang:
+    nickname = {'EN': 'Nickname', 'FR': ''}
+    play = {'EN': 'Play Morris', 'FR': ''}
+    quit = {'EN': 'Quit Game', 'FR': ''}
+
+
 class Quit(tk.Button):
     def on_click(self):
         self.window.quit()
@@ -11,17 +17,21 @@ class Quit(tk.Button):
 
 class Play(tk.Button):
     def on_click(self):
-        from .local import Local
-        self.window.view = Local()
+        if self.window.features:
+            from .local import Local
+            self.window.view = Local()
+        else:
+            from .templates import Choice
+            self.window.view = Choice()
 
 
 class Menu(tk.View):
     def __init__(self):
         super().__init__()
-        self.nickname = tk.InputField(x=360, y=150, width=400, height=50, text='Nickname: ',
+        self.nickname = tk.InputField(x=360, y=150, width=400, height=50, text=f'{lang.nickname[self.window.lang]}: ',
                                       color=tk.palette.light_peach, max_length=12, default=self.window.nickname)
-        self.play = Play(x=360, y=250, width=200, height=50, text='Play Morris', color=tk.palette.yellow)
-        self.quit = Quit(x=360, y=350, width=200, height=50, text='Quit game', color=tk.palette.red)
+        self.play = Play(x=360, y=250, width=200, height=50, text=lang.play[self.window.lang], color=tk.palette.yellow)
+        self.quit = Quit(x=360, y=350, width=200, height=50, text=lang.quit[self.window.lang], color=tk.palette.red)
 
     def on_draw(self):
         self.nickname.draw()

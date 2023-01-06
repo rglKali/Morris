@@ -131,10 +131,9 @@ class Sprite:
     def __init__(self, x: int = None, y: int = None, hitbox: list = None):
         self.window = get_window()
         self.x, self.y = x, y
+        self.hitbox = set()
         if hitbox:
-            self.hitbox = [(self.x + i, self.y + j) for i, j in hitbox]
-        else:
-            self.hitbox = [(self.x, self.y)]
+            [self.hitbox.add((self.x + i, self.y + j)) for i, j in hitbox]
 
     def update(self):
         pass
@@ -152,6 +151,7 @@ class Sprite:
 class SpriteList(list):
     def __init__(self, *sprites):
         super().__init__(sprites)
+        self.window = get_window()
 
     def update(self, *args):
         [sprite.update() for sprite in self]
@@ -184,19 +184,19 @@ def get_random_color(colors: list[str] = None):
 
 
 def hitbox_circle(radius: int):
-    hitbox = list()
+    hitbox = set()
     for x in range(-radius, radius + 1):
         for y in range(-radius, radius + 1):
-            if x ** 2 + y ** 2 <= radius ** 2 and (x, y) not in hitbox:
-                hitbox.append((x, y))
+            if x ** 2 + y ** 2 <= radius ** 2:
+                hitbox.add((x, y))
     return hitbox
 
 
 def hitbox_rect(width: int, height: int):
-    hitbox = list()
+    hitbox = set()
     for w in range(-(width//2), (width//2) + 1):
         for h in range(-(height//2), (height//2) + 1):
-            hitbox.append((w, h))
+            hitbox.add((w, h))
     return hitbox
 
 

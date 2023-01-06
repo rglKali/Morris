@@ -17,14 +17,14 @@ class Board:
         self.name = None
         self.size = None
         self.points = list()
-        self.pieces = None
+        self.badges = None
         self.unite = None
         self.skip = None
 
         if data:
             self.name = data['name']
             self.size = data['size']
-            self.pieces = data['pieces']
+            self.badges = data['badges']
             self.unite = data['unite']
             self.skip = data['skip']
             [self.add_point(point) for point in data['points']]
@@ -51,42 +51,4 @@ class Board:
 class Player:
     def __init__(self, nickname: str, data: dict):
         self.name = nickname
-        self.pieces = None
-
-
-#
-# class Point(tk.Sprite):
-#     def __init__(self, name: str):
-#         super().__init__()
-#         self.name = name
-#         self.gx = string.ascii_letters.index(name[1])
-#         self.gy = string.digits.index(name[1])
-#         self.neighbors = tk.SpriteList()
-#
-#
-# class Board:
-#     name: str
-#     size: int
-#     points: tk.SpriteList[Point]
-#     pieces: int
-#     unite: bool
-#     skip: bool
-#
-#     def __init__(self, x: int, y: int, width: int, height: int, data: dict = None):
-#         super().__init__()
-#         self.points = tk.SpriteList()
-#         if data:
-#             self.name = data['name']
-#             self.size = data['size']
-#             [self.add_point(point) for point in data['points']]
-#             self.pieces = data['pieces']
-#             self.move = data['move']
-#             self.game = data['game']
-#             self.unite = data['unite']
-#             self.skip = data['skip']
-#
-#     def add_point(self, name: str):
-#         pass
-#
-#     def add_connect(self, name: str):
-#         pass
+        self.badges = None

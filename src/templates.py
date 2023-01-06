@@ -7,14 +7,27 @@ from .data import Board
 __all__ = ['Choice']
 
 
+class lang:
+    badges = {'EN': 'Badges', 'FR': ''}
+    unite = {'EN': 'Unite', 'FR': ''}
+    skip = {'EN': 'Skip', 'FR': ''}
+    play = {'EN': 'Play selected', 'FR': ''}
+    delete = {'EN': 'Delete selected', 'FR': ''}
+    lan = {'EN': 'Return to LAN games', 'FR': ''}
+    menu = {'EN': 'Return to main menu', 'FR': ''}
+    editor = {'EN': 'Create my template', 'FR': ''}
+
+
 class Template(tk.Button):
     radius = 5
 
     def __init__(self, data: dict, order: int):
-        self._raw = data
+        self.data = data
         super().__init__(105 + order * 170, 160, 160, 280)
-        self.description = f"{order + 1}. {data['name']}\nPieces: {data['pieces']}\n" \
-                           f"Unite: {data['unite']}\nSkip: {data['skip']}"
+        self.description = f"{order + 1}. {data['name']}\n" \
+                           f"{lang.badges[self.window.lang]}: {data['badges']}\n" \
+                           f"{lang.unite[self.window.lang]}: {data['unite']}\n" \
+                           f"{lang.skip[self.window.lang]}: {data['skip']}"
         self.board = Board(data)
         self.delta = 60 / (self.board.size // 2)
 
@@ -40,15 +53,19 @@ class Template(tk.Button):
                                  self.x + self.delta * neighbor.x, self.y - 60 + self.delta * neighbor.y)
 
     def on_click(self):
-        from .lobby import Lobby
-        self.window.view = Lobby(self.board)
+        if self.window.features:
+            from .lobby import Lobby
+            self.window.view = Lobby(self.board)
+        else:
+            from .game import Game
+            self.window.view = Game(self.board)
 
 
 class Templates(tk.SpriteList):
-    def __init__(self, data: list):
+    def __init__(self):
         super().__init__()
-        self._raw = data
-        for num, board in enumerate(data):
+        self._raw = json.load(open('data/boards.json'))
+        for num, board in enumerate(self._raw):
             self.append(Template(board, num))
 
         self.selector = 0
@@ -78,7 +95,6 @@ class Templates(tk.SpriteList):
     def delete(self):
         self.pop(self.selector + self.local)
         self._raw.pop(self.selector + self.local)
-        print(self._raw)
         json.dump(self._raw, open('data/boards.json', 'w'), indent=4)
 
     def draw(self):
@@ -110,32 +126,45 @@ class Create(tk.Button):
 
 class Return(tk.Button):
     def on_click(self):
-        from .local import Local
-        self.window.view = Local()
+        if self.window.features:
+            from .local import Local
+            self.window.view = Local()
+        else:
+            from .menu import Menu
+            self.window.view = Menu()
 
 
 class Choice(tk.View):
     def __init__(self):
         super().__init__()
-        self.templates = Templates(json.load(open('data/boards.json')))
-        self.play = Play(x=180, y=360, width=340, height=50, text='Play selected', color=tk.palette.yellow)
-        self.delete = Delete(x=540, y=360, width=340, height=50, text='Delete selected', color=tk.palette.light_peach)
-        self.menu = Return(x=180, y=440, width=340, height=50, text='Return to LAN games', color=tk.palette.red)
-        self.editor = Create(x=540, y=440, width=340, height=50, text='Create my template', color=tk.palette.light_peach)
+        self.templates = Templates()
+        self.play = Play(x=540, y=440, width=340, height=50, text=lang.play[self.window.lang], color=tk.palette.yellow)
+        if self.window.features:
+            self.menu = Return(x=180, y=440, width=340, height=50,
+                               text=lang.lan[self.window.lang], color=tk.palette.red)
+        else:
+            self.menu = Return(x=180, y=440, width=340, height=50,
+                               text=lang.menu[self.window.lang], color=tk.palette.red)
+        if self.window.features:
+            self.delete = Delete(x=540, y=360, width=340, height=50,
+                                 text=lang.delete[self.window.lang], color=tk.palette.light_peach)
+            self.editor = Create(x=180, y=360, width=340, height=50,
+                                 text=lang.editor[self.window.lang], color=tk.palette.light_peach)
 
     def on_draw(self):
         self.templates.draw()
         self.play.draw()
-        self.delete.draw()
-        self.editor.draw()
         self.menu.draw()
+        if self.window.features:
+            self.delete.draw()
+            self.editor.draw()
 
     def on_key_press(self, key: str):
         if key == 'Escape':
             self.menu.on_click()
         elif key == 'Return':
             self.play.on_click()
-        elif key == 'Delete':
+        elif key == 'Delete' and self.window.features:
             self.delete.on_click()
         elif key == 'Right':
             self.templates.move_right()
@@ -143,8 +172,9 @@ class Choice(tk.View):
             self.templates.move_left()
 
     def on_mouse_press(self, x: int, y: int, key):
+        self.templates.click(x, y)
         self.play.click(x, y)
         self.menu.click(x, y)
-        self.delete.click(x, y)
-        self.editor.click(x, y)
-        self.templates.click(x, y)
+        if self.window.features:
+            self.delete.click(x, y)
+            self.editor.click(x, y)

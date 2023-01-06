@@ -62,7 +62,7 @@
             "g1g4",
             "g4g7"
         ],
-        "pieces": 9,
+        "badges": 9,
         "unite": false,
         "skip": false
     },
@@ -98,7 +98,7 @@
             "a3b2",
             "b2c1"
         ],
-        "pieces": 3,
+        "badges": 3,
         "unite": false,
         "skip": false
     },
@@ -145,7 +145,7 @@
             "a5c5",
             "c5e5"
         ],
-        "pieces": 6,
+        "badges": 6,
         "unite": false,
         "skip": false
   }

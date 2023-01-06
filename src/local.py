@@ -6,9 +6,14 @@ from . import pytk as tk
 __all__ = ['Local']
 
 
+class lang:
+    create = {'EN': 'Create my lobby', 'FR': ''}
+    menu = {'EN': 'Return to menu', 'FR': ''}
+
+
 class NetworkGame(tk.Sprite):
     def __init__(self):
-        super().__init__(x=int(), y=int())
+        super().__init__()
 
 
 class Games(tk.SpriteList):
@@ -57,8 +62,8 @@ class Local(tk.View):
         super().__init__()
         self.games = Games()
         self.filters = Filters()
-        self.new = Create(x=540, y=380, width=340, height=50, text='Create my lobby', color=tk.palette.yellow)
-        self.menu = Return(x=540, y=440, width=340, height=50, text='Return to menu', color=tk.palette.red)
+        self.new = Create(x=540, y=380, width=340, height=50, text=lang.create[self.window.lang], color=tk.palette.yellow)
+        self.menu = Return(x=540, y=440, width=340, height=50, text=lang.menu[self.window.lang], color=tk.palette.red)
 
     def on_update(self, delta_time: float):
         self.games.update(self.filters)
