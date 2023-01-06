@@ -54,10 +54,10 @@ class Menu(tk.View):
     def on_key_press(self, key: str):
         if key == 'Escape':
             self.quit.on_click()
-        elif key == 'Return' and len(self.nickname) >= 4:
-            self.play.on_click()
         elif self.window.features:
-            if key == 'Left':
+            if key == 'Return' and len(self.nickname) > 4:
+                self.play.on_click()
+            elif key == 'Left':
                 self.nickname.move_selector_left()
             elif key == 'Right':
                 self.nickname.move_selector_right()
@@ -65,6 +65,8 @@ class Menu(tk.View):
                 self.nickname.remove_char()
             else:
                 self.nickname.add_char(key)
+        elif key == 'Return':
+            self.play.on_click()
 
     def on_mouse_press(self, x: int, y: int, key):
         if self.window.features:

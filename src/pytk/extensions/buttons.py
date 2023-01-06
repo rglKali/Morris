@@ -26,11 +26,11 @@ class Button(Sprite):
         draw_rect(self.x, self.y, self.width, self.height, color=self.color, thickness=config.outline)
         draw_text(self.x, self.y, self.text)
 
-    def click(self, x: int, y: int):
+    def click(self, x: int, y: int, *args):
         if self.collides_with_point(x, y):
-            self.on_click()
+            self.on_click(args)
 
-    def on_click(self):
+    def on_click(self, *args):
         pass
 
 

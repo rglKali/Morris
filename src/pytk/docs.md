@@ -100,10 +100,10 @@ Requires you to work with objects in a more comfortable way.
 Automatically catches the current window, and creates a reference to it
 
 #### x (required) ``int``
-Represents the ``x`` coordinate of the sprite in the ``Window`` according to the ``offset`` parameter.
+Represents the ``x`` coordinate of the sprite in the ``Window``.
 
 #### y (required) ``int``
-Represents the ``y`` coordinate of the sprite in the ``Window`` according to the ``offset`` parameter.
+Represents the ``y`` coordinate of the sprite in the ``Window``.
 
 #### hitbox (optional) ``list[tuple[int, int]]``
 Represents the ``Sprite``'s hitbox, according to it's ``x`` and ``y`` coordinates
@@ -139,6 +139,11 @@ Draws all containing sprites.
 #### draw() -> None
 Called manually (usually during ``Window``'s or ``View``'s ``on_update`` methods). 
 Updates all containing sprites.
+
+>
+
+### class palette
+A palette, containing recommended colors to use with PyTk
 
 >
 
@@ -300,3 +305,100 @@ Returns a random color.
 #### colors (optional) ``list[str]``
 The list of the colors to choose.
 If not provided, default palette from the config will be used.
+
+
+> ## Buttons extension
+
+## class Button
+
+Basic button object.
+Subclass of the Sprite object.
+Allows you to create rectangular buttons.
+
+### ~Attributes~
+
+#### x (required) ``int``
+Represents the ``x`` coordinate.
+
+#### y (required) ``int``
+Represents the ``y`` coordinate.
+
+#### width (required) ``int``
+Represents the width.
+
+#### height (required) ``int``
+Represents the height
+
+#### text (optional, default) ``str``
+The text of the button. 
+If not provided, would be blank.
+
+#### color (optional, default) ``str``
+Hex value of the button's color. 
+Recommended to use one of ``palette`` colors.
+Default value: ``palette.white``.
+
+### ~Methods~
+
+#### update() -> None
+Same as ``Sprite``
+
+#### draw() -> None
+Same as ``Sprite``
+
+#### click(x: int, y: int, *args) -> on_click(*args) or None
+Function, used in main code to check, if the button was clicked.
+If yes, calls ``on_click`` function.
+Different arguments passed to this function would be also passed to ``on_click`` function.
+
+#### on_click(*args) -> None
+Function, used for subclassing. 
+Called automatically after ``click``.
+Here should be all button's logic.
+
+>
+
+## class CheckBox
+
+Basic checkbox object.
+Subclass of the Sprite object.
+Allows you to create square checkboxes.
+
+### ~Attributes~
+
+#### x (required) ``int``
+Represents the ``x`` coordinate.
+
+#### y (required) ``int``
+Represents the ``y`` coordinate.
+
+#### size (required) ``int``
+Represents the size.
+
+#### color (optional, default) ``str``
+Hex value of the button's color. 
+Recommended to use one of ``palette`` colors.
+Default value: ``palette.white``.
+Note, that, when ``CheckBox`` is clicked, the color would change to ``palette.red`` or ``palette.yellow``. 
+
+#### value (default): ``bool``
+Value that represents the checkbox status.
+Could be ejected using built-in ``bool(CheckBox)``
+
+### ~Methods~
+
+#### update() -> None
+Same as ``Sprite``
+
+#### draw() -> None
+Same as ``Sprite``
+
+#### click(x: int, y: int) -> None
+Function, used in main code to check, if the button was clicked.
+If yes, calls changes ``value``.
+
+>
+
+## class InputField
+too much text, sorry...
+Just see the ``buttons.py`` in samples.

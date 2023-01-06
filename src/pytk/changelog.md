@@ -63,6 +63,20 @@
 
 ``PyTK Docs``: No changes.
 
-``PyTk Extensions``: No changes
+``PyTk Extensions``: No changes.
 
 ``PyTk Samples``: No changes.
+
+### 06.01.2023 - Release 1.5 final
+``PyTk Sources``: Bug fix.
+1. Minor bug fixes + refactor.
+
+``PyTk Docs``: Update.
+1. Added docs for buttons extension.
+
+``PyTk Extensions``: Bug fix.
+1. Minor bug fixes.
+2. Removed ``action`` argument from ``Button`` class. Subclass instead.
+
+``PyTk Samples``: Refactor.
+1. Removed ``sub`` sample, due to extension update.

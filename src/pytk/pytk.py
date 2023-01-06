@@ -8,7 +8,6 @@ from .fltk import CustomCanvas, type_ev, touche, abscisse, ordonnee
 
 __all__ = [
     # Data
-    'config',
     'palette',
 
     # Classes
@@ -33,15 +32,6 @@ _window: Optional['Window'] = None
 
 
 @dc.dataclass
-class config:
-    dev_width = 720
-    dev_height = 480
-    font_name = 'JetBrains Mono'
-    font_size = 20
-    outline = 5
-
-
-@dc.dataclass
 class palette:
     black = "#000000"
     dark_blue = "#1D2B53"
@@ -63,7 +53,13 @@ class palette:
 
 # Classes
 class Window(CustomCanvas):
-    def __init__(self, width: int = config.dev_width, height: int = config.dev_height,
+    dev_width = 720
+    dev_height = 480
+    font_name = 'JetBrains Mono'
+    font_size = 20
+    outline = 5
+
+    def __init__(self, width: int = dev_width, height: int = dev_height,
                  fullscreen: bool = False, bg: str = palette.white, refresh_rate: int = 120):
         super().__init__(width, height, refresh_rate)
         self.bg = bg
@@ -84,8 +80,8 @@ class Window(CustomCanvas):
             height = self.root.winfo_screenheight()
 
         self.canvas.config(width=width, height=height)
-        self.dx = width / config.dev_width
-        self.dy = height / config.dev_height
+        self.dx = width / self.dev_width
+        self.dy = height / self.dev_height
 
     def draw_bg(self):
         draw_rect(360, 240, 720, 480, self.bg, thickness=0)
@@ -201,29 +197,39 @@ def hitbox_rect(width: int, height: int):
 
 
 def draw_line(ax: int, ay: int, bx: int, by: int,
-              color: str = palette.black, thickness: int = config.outline):
+              color: str = palette.black, thickness: int = None):
     w = get_window()
+    if thickness is None:
+        thickness = w.outline
     w.canvas.create_line(ax * w.dx, ay * w.dy, bx * w.dx, by * w.dy, fill=color, width=thickness * min(w.dx, w.dy))
 
 
 def draw_circle(x: int, y: int, radius: int, color: str = get_random_color(),
-                outline: str = palette.black, thickness: int = config.outline):
+                outline: str = palette.black, thickness: int = None):
     w = get_window()
+    if thickness is None:
+        thickness = w.outline
     w.canvas.create_oval((x - radius) * w.dx, (y - radius) * w.dy, (x + radius) * w.dx, (y + radius) * w.dy,
                          fill=color, outline=outline, width=thickness * min(w.dx, w.dy))
 
 
 def draw_rect(x: int, y: int, width: int, height: int, color: str = palette.light_grey,
-              outline: str = palette.black, thickness: int = config.outline):
+              outline: str = palette.black, thickness: int = None):
     w = get_window()
+    if thickness is None:
+        thickness = w.outline
     w.canvas.create_rectangle((x - width//2) * w.dx, (y - height//2) * w.dy,
                               (x + width//2) * w.dx, (y + height//2) * w.dy,
                               fill=color, outline=outline, width=thickness * min(w.dx, w.dy))
 
 
-def draw_text(x: int, y: int, text: str, font_name: str = config.font_name, font_size: int = config.font_size,
+def draw_text(x: int, y: int, text: str, font_name: str = None, font_size: int = None,
               color: str = palette.black, location: str = 'center'):
     w = get_window()
+    if font_name is None:
+        font_name = w.font_name
+    if font_size is None:
+        font_size = w.font_size
     w.canvas.create_text(x * w.dx, y * w.dy, text=text, font=(font_name, round(font_size * min(w.dx, w.dy))),
                          fill=color, anchor=location)
 
