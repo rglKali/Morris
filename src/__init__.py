@@ -6,7 +6,7 @@ class Window(tk.Window):
     height = 480
     fullscreen = True
     lang = 'FR'
-    features = False
+    features = True
     if features:
         nickname = 'kali'
         color = tk.palette.orange

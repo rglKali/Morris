@@ -13,7 +13,7 @@ class lang:
     skip = {'EN': 'Skip', 'FR': 'Sauter'}
     play = {'EN': 'Play selected', 'FR': 'Jouer la sélection'}
     delete = {'EN': 'Delete selected', 'FR': 'Supprimer la sélection'}
-    lan = {'EN': 'Return to LAN games', 'FR': 'Revenir aux parties locales'}
+    lan = {'EN': 'Return to LAN games', 'FR': 'Revenir aux locales'}
     menu = {'EN': 'Return to main menu', 'FR': 'Revenir au menu principal'}
     editor = {'EN': 'Create my template', 'FR': 'Créer mon modèle'}
 
