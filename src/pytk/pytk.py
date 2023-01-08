@@ -270,6 +270,8 @@ def run():
         if w.view:
             w.view.on_update(tm.time() - w.last_update)
 
+        w.last_update = tm.time()
+
         w.canvas.delete('all')
 
         w.draw_bg()
@@ -280,7 +282,6 @@ def run():
 
         w.root.update()
         tm.sleep(max(0., w.interval - (tm.time() - w.last_update)))
-        w.last_update = tm.time()
 
         if not w.active:
             w.root.destroy()

@@ -4,8 +4,8 @@ from . import pytk as tk
 class Window(tk.Window):
     width = 720
     height = 480
-    fullscreen = True
-    lang = 'FR'
+    fullscreen = False
+    lang = 'EN'
     features = True
     if features:
         nickname = 'kali'

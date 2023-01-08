@@ -89,31 +89,31 @@ class EGrid(tk.Sprite):
         x, y = round(540 + 140 * (x / (size // 2) - 1)), round(180 + 140 * (y / (size // 2) - 1))
         super().__init__(x=x, y=y, hitbox=tk.hitbox_circle(10))
         self.active = False
-        self.available = None
+
+    def __str__(self):
+        return self.name
+
+    def __bool__(self):
+        return self.active
 
     def bind(self):
         tk.draw_circle(self.x, self.y, 10, color=tk.palette.green)
 
     def draw(self):
-        if self.available is not None:
-            if self.available:
-                tk.draw_circle(self.x, self.y, 10, color=tk.palette.yellow)
-            else:
-                tk.draw_circle(self.x, self.y, 10, color=tk.palette.red)
-
-        elif self.active:
-            tk.draw_circle(self.x, self.y, 10, color=tk.palette.light_grey)
+        if self.active:
+            tk.draw_circle(self.x, self.y, 10, color=tk.palette.light_peach)
         else:
             tk.draw_circle(self.x, self.y, 2, color=tk.palette.black)
 
 
 class EPoint(tk.Sprite):
     def __init__(self):
+        self.mode = True
         self.radius = 20
         super().__init__(x=420, y=420, hitbox=tk.hitbox_circle(self.radius))
 
     def draw(self):
-        if self.window.view.board.mode == 'P':
+        if self.mode:
             tk.draw_circle(self.x, self.y, self.radius, color=tk.palette.light_peach)
         else:
             tk.draw_circle(self.x, self.y, self.radius, color=tk.palette.light_grey)
@@ -121,6 +121,7 @@ class EPoint(tk.Sprite):
 
 class EConnect(tk.Sprite):
     def __init__(self):
+        self.mode = False
         self.width = 80
         self.height = 20
         self.radius = 20
@@ -131,7 +132,7 @@ class EConnect(tk.Sprite):
         [self.hitbox.add((x + self.lx, y + self.y)) for (x, y) in tk.hitbox_circle(self.radius)]
 
     def draw(self):
-        if self.window.view.board.mode == 'C':
+        if self.mode:
             color = tk.palette.light_peach
         else:
             color = tk.palette.light_grey
@@ -146,12 +147,25 @@ class EBoard(tk.SpriteList):
         if size:
             self.extend([EGrid(x, y, size) for x in range(size) for y in range(size)])
 
+        self.size = size
         self.point = EPoint()
         self.connect = EConnect()
         self.bind = None
-        self.avl = None
         self.mode = None
+        self.blocked = tk.SpriteList()
         self._connects = list()
+
+    @property
+    def unconnected(self):
+        unconnected = 0
+        for point in [point for point in self if point.active]:
+            connected = False
+            for connect in self._connects:
+                if point in connect:
+                    connected = True
+            if not connected:
+                unconnected += 1
+        return unconnected
 
     @property
     def points(self):
@@ -161,73 +175,86 @@ class EBoard(tk.SpriteList):
     def connects(self):
         return [p1.name + p2.name for (p1, p2) in self._connects]
 
-    def _connect(self, point):
-        dx = self.bind.gx - point.gx
-        dy = self.bind.gy - point.gy
-        return {'point': point, 'angle': dx / dy, 'distance': dx ** 2 + dy ** 2}
+    @property
+    def mills(self):
+        for ind, c1 in enumerate(self._connects):
+            for c2 in self._connects[:ind]:
+                points = set(c1 + c2)
+                if len(points) == 3:
+                    for p1 in points:
+                        for p2 in points:
+                            for p3 in points:
+                                if p1 != p2 and p2 != p3 and p3 != p1 and p2.y - p3.y == p3.y - p1.y and \
+                                        min(p2.x, p1.x) < p3.x < max(p2.x, p1.x) and \
+                                        min(p2.y, p1.y) < p3.y < max(p2.y, p1.y):
+                                    return True
+        return False
 
-    def set_avl(self):
-        self.avl = set()
-        for point in self:
-            if point.active:
-                pass
+    def _get_blocked(self, p1: 'EGrid', p2: 'EGrid'):
+        blocked = list()
+
+        if p1.gx == p2.gx:
+            for p3 in self:
+                if min(p1.gy, p2.gy) < p3.gy < max(p1.gy, p2.gy) and p3.gx == p1.gx == p2.gx:
+                    blocked.append(p3)
+
+        elif p1.gy == p2.gy:
+            for p3 in self:
+                if min(p1.gx, p2.gx) < p3.gx < max(p1.gx, p2.gx) and p3.gy == p1.gy == p2.gy:
+                    blocked.append(p3)
+
+        else:
+            for p3 in self:
+                if p1.gx == p3.gx or p2.gx == p3.gx or p1.gy == p3.gy or p2.gy == p3.gy:
+                    continue
+                if min(p1.gy, p2.gy) < p3.gy < max(p1.gy, p2.gy) and min(p1.gx, p2.gx) < p3.gx < max(p1.gx, p2.gx) and \
+                        (p1.gx - p3.gx) / (p1.gy - p3.gy) == (p2.gx - p3.gx) / (p2.gy - p3.gy):
+                    blocked.append(p3)
+
+        return blocked
 
     def click(self, x, y):
         if self.point.collides_with_point(x, y):
-            for point in self:
-                if point.active:
-                    point.available = None
-            if self.mode == 'P':
-                self.mode = None
-                for grid in self:
-                    grid.available = None
-            else:
-                self.bind = None
-                self.avl = None
-                for grid in self:
-                    if grid.active:
-                        grid.available = False
-                    else:
-                        grid.available = True
-                self.mode = 'P'
+            self.bind = None
+            self.point.mode = True
+            self.connect.mode = False
         elif self.connect.collides_with_point(x, y):
-            for point in self:
-                if point.active:
-                    point.available = None
-
-            if self.mode == 'C':
-                self.mode = None
-                self.bind = None
-            else:
-                for grid in self:
-                    if grid.active:
-                        grid.available = True
-                    else:
-                        grid.available = None
-                self.mode = 'C'
+            self.bind = None
+            self.point.mode = False
+            self.connect.mode = True
         else:
             for grid in self:
                 if grid.collides_with_point(x, y):
-                    if self.mode == 'P':
-                        grid.active = not grid.active
-                        grid.available = not grid.available
-                    elif self.mode == 'C':
+                    if self.point.mode:
+                        if grid.active:
+                            connects = self._connects.copy()
+                            for connect in self._connects:
+                                if grid in connect:
+                                    [self.blocked.remove(point) for point in self._get_blocked(*connect)]
+                                    connects.remove(connect)
+                            self._connects = connects.copy()
+                            grid.active = False
+                        elif grid not in self.blocked:
+                            grid.active = True
+                    elif self.connect.mode and grid.active:
                         if self.bind is None:
                             self.bind = grid
-                            self.set_avl()
-                            for point in self:
-                                if point in self.avl:
-                                    point.available = True
-                                else:
-                                    point.available = False
                         else:
-                            if grid in self.avl:
-                                self._connects.append([self.bind, grid])
+                            if grid == self.bind:
                                 self.bind = None
-                                self.avl = None
-                                for point in self:
-                                    if point.active:
-                                        point.available = True
+                            else:
+                                if (grid, self.bind) in self._connects:
+                                    [self.blocked.remove(point) for point in self._get_blocked(grid, self.bind)]
+                                    self._connects.remove((grid, self.bind))
+                                    self.bind = None
+                                else:
+                                    for point in self._get_blocked(grid, self.bind):
+                                        if point.active:
+                                            return
+                                    [self.blocked.append(point) for point in self._get_blocked(grid, self.bind)]
+                                    self._connects.append((grid, self.bind))
+                                    self.bind = None
+                    return
 
     def draw(self):
         tk.draw_rect(540, 180, 340, 340)
@@ -244,23 +271,16 @@ class EBoard(tk.SpriteList):
 class Save(tk.Button):
     def on_click(self):
         if self.color == tk.palette.light_peach:
-            w = self.window.view
-            board = {
-                'name': str(w.name),
-                'size': int(w.size),
-                'points': list(),
-                'connects': list(),
-                'badges': int(w.badges),
-                'unite': bool(w.unite),
-                'skip': bool(w.skip)
-            }
-            json.dump(json.load(open('data/boards.json')) + board, open('data/boards.json', 'w'), indent=4)
+            json.dump(json.load(open('data/boards.json')) + [self.window.view.json], open('data/boards.json', 'w'), indent=4)
+
+            self.window.view.templates.on_click()
 
 
 class Confirm(tk.Button):
     def on_click(self):
         if self.color == tk.palette.yellow:
-            pass
+            from .lobby import Lobby
+            self.window.view = Lobby(self.window.view.json, None)
 
 
 class Return(tk.Button):
@@ -292,14 +312,26 @@ class Editor(tk.View):
     def create_new_board(self):
         self.board = EBoard(int(self.size))
 
-    # def on_update(self, delta_time: float):
-    #     cond = True
-    #     if cond:
-    #         self.save.color = tk.palette.light_peach
-    #         self.confirm.color = tk.palette.yellow
-    #     else:
-    #         self.save.color = tk.palette.light_grey
-    #         self.confirm.color = tk.palette.light_grey
+    @property
+    def json(self):
+        return {
+            'name': str(self.name),
+            'size': int(self.size),
+            'points': list(self.board.points),
+            'connects': list(self.board.connects),
+            'badges': int(self.badges),
+            'unite': bool(self.unite),
+            'skip': bool(self.skip)
+        }
+
+    def _check_for_board(self):
+        if len(self.name) >= 6 and self.board.mills and \
+                3 <= int(self.badges) <= 2 * len(self.board.points) - self.board.unconnected:
+            self.save.color = tk.palette.light_peach
+            self.confirm.color = tk.palette.yellow
+        else:
+            self.save.color = tk.palette.light_grey
+            self.confirm.color = tk.palette.light_grey
 
     def on_key_press(self, key: str):
         if key == 'Escape':
@@ -317,6 +349,8 @@ class Editor(tk.View):
             self.name.add_char(key)
             self.badges.add_char(key)
 
+        self._check_for_board()
+
     def on_mouse_press(self, x: int, y: int, key):
         self.name.click(x, y)
         if self.size.click(x, y):
@@ -328,6 +362,8 @@ class Editor(tk.View):
         self.confirm.click(x, y)
         self.templates.click(x, y)
         self.board.click(x, y)
+
+        self._check_for_board()
 
     def on_draw(self):
         self.name.draw()

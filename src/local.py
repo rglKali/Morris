@@ -28,6 +28,7 @@ class Games(tk.SpriteList):
 
     def draw(self):
         tk.draw_rect(x=180, y=240, width=340, height=460)
+        tk.draw_text(x=180, y=240, text='Dev')
         super().draw()
 
     def update(self, filters):
@@ -42,6 +43,7 @@ class Filters(tk.SpriteList):
 
     def draw(self):
         tk.draw_rect(x=540, y=140, width=340, height=260, color=tk.palette.light_peach)
+        tk.draw_text(x=540, y=140, text='Dev')
         super().draw()
 
 

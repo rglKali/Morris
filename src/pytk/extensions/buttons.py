@@ -89,7 +89,10 @@ class InputField(Sprite):
         return len(self.value)
 
     def __int__(self):
-        return int(self.value)
+        if self.value.isnumeric():
+            return int(self.value)
+        else:
+            return 0
 
     def __str__(self):
         return self.value

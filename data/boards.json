@@ -148,5 +148,41 @@
         "badges": 6,
         "unite": false,
         "skip": false
-  }
+    },
+    {
+        "name": "SpaceShuttle",
+        "size": 4,
+        "points": [
+            "a1",
+            "a5",
+            "b2",
+            "b3",
+            "c2",
+            "c3",
+            "c5",
+            "d4",
+            "e1",
+            "e3",
+            "e5"
+        ],
+        "connects": [
+            "a5c3",
+            "c5a5",
+            "d4c5",
+            "e3d4",
+            "e5e3",
+            "c5e5",
+            "b3c5",
+            "a1b3",
+            "b2a1",
+            "c3b2",
+            "e1c3",
+            "e3e1",
+            "c2e3",
+            "a1c2"
+        ],
+        "badges": 5,
+        "unite": true,
+        "skip": false
+    }
 ]

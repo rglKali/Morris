@@ -15,11 +15,12 @@ class GAction(tk.Sprite):
         super().__init__()
         self.order = order
         self.data = data
-        self.text = f'[{self.data.player}] {self.data.action}: ' \
-                    f'{self.data.from_point.name}, {self.data.to_point.name}'
+        from_name = f'{data.from_point.name}' if data.from_point is not None else '__'
+        to_name = f'{data.to_point.name}' if data.to_point is not None else '__'
+        self.text = f'[{data.player.name}]: {from_name} -> {to_name}'
 
     def draw(self):
-        tk.draw_text(0, self.order, self.text, font_size=10, location='nw')
+        tk.draw_text(520, (self.order + 1) * 15, self.text, font_size=10, location='nw')
 
 
 class History(tk.SpriteList):
@@ -41,6 +42,10 @@ class GPlayer(tk.Sprite):
         self.mill = False
         self.color = color if color else random.choice([tk.palette.brown, tk.palette.orange, tk.palette.blue,
                                                         tk.palette.white, tk.palette.pink, tk.palette.lavender])
+
+    @property
+    def name(self):
+        return self.data.name
 
     def click(self, x, y):
         if self.collides_with_point(x, y):
@@ -103,6 +108,8 @@ class GBoard(tk.SpriteList):
         point = self._get_point(x, y)
         if point is None:
             pass
+        elif point is self.bind:
+            self.bind = None
         elif player.mill and point.data.player is not None and point.data.player != player:
             point.data.player = None
             return player, point.data, None
