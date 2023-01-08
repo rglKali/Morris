@@ -80,3 +80,23 @@
 
 ``PyTk Samples``: Refactor.
 1. Removed ``sub`` sample, due to extension update.
+
+
+### 08.01.2023 - Release 2.0
+``PyTk Sources``: Major Update & refactor.
+1. Now doesn't require using fltk's CustomCanvas. Works fully automatically.
+2. No further possibility to resize the window or going to fullscreen.
+3. Now the code is divided into separate files according to its sense.
+4. Functionality of the library is definitely the same as was, except:
+   1. get_random_color(colors) -> palette.random(). Now is a method of ``palette`` object. Returns random color from the palette
+   2. run() -> Window().run(). Now is a method of a called Window object.
+   3. Added ``draw_text_flex(x, y, width, height, args)`` function to the ``draw`` block. Matches font size automatically, according to width and height
+
+``PyTk Docs``: No changes.
+1. Docs will be updated with the next update, but there are no major updates
+
+``PyTk Extensions``: Removed.
+1. Now ``Buttons`` is an official part of the library, all other extensions were removed.
+
+``PyTk Samples``: Removed.
+1. Updated according to the Sources Update

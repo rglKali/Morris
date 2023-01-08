@@ -1,15 +1,17 @@
 from time import time
 import string
 
-
-from ..pytk import palette, Sprite, hitbox_rect, draw_rect, draw_line, draw_text
+from .core import Sprite
+from .data import palette, config
+from .draw import draw_rect, draw_text, draw_line
+from .hitbox import hitbox_rect
 
 
 __all__ = [
     'Button',
     'CheckBox',
     'InputField',
-    'Slider'        # May cause issues, still in development
+    # 'Slider'        # May cause issues, still in development
 ]
 
 
@@ -23,29 +25,32 @@ class Button(Sprite):
         self.text = text
 
     def draw(self):
-        draw_rect(self.x, self.y, self.width, self.height, color=self.color, thickness=self.window.outline)
+        draw_rect(self.x, self.y, self.width, self.height, color=self.color, thickness=config.outline_thickness)
         draw_text(self.x, self.y, self.text)
 
     def click(self, x: int, y: int):
         if self.collides_with_point(x, y):
             self.on_click()
+            return True
+        else:
+            return False
 
     def on_click(self):
         pass
 
 
 class CheckBox(Sprite):
-    def __init__(self, x: int, y: int, size: int, color: str = palette.white):
+    def __init__(self, x: int, y: int, size: int, color: str = palette.white, default: bool = None):
         super().__init__(x, y, hitbox=hitbox_rect(size, size))
         self.color = color
         self.size = size
-        self.value = None
+        self.value = default
 
     def __bool__(self):
         return not not self.value
 
     def draw(self):
-        draw_rect(self.x, self.y, self.size, self.size, color=self.color, thickness=self.window.outline)
+        draw_rect(self.x, self.y, self.size, self.size, color=self.color, thickness=config.outline_thickness)
 
         if self.value is None:
             return
@@ -53,17 +58,17 @@ class CheckBox(Sprite):
         if self.value:
             draw_line(self.x - self.size // 2, self.y,
                       self.x, self.y + self.size // 2,
-                      thickness=self.window.outline)
+                      thickness=config.outline_thickness)
             draw_line(self.x, self.y + self.size // 2,
                       self.x + self.size // 2, self.y - self.size // 2,
-                      thickness=self.window.outline)
+                      thickness=config.outline_thickness)
         else:
             draw_line(self.x - self.size // 2, self.y - self.size // 2,
                       self.x + self.size // 2, self.y + self.size // 2,
-                      thickness=self.window.outline)
+                      thickness=config.outline_thickness)
             draw_line(self.x + self.size // 2, self.y - self.size // 2,
                       self.x - self.size // 2, self.y + self.size // 2,
-                      thickness=self.window.outline)
+                      thickness=config.outline_thickness)
 
     def click(self, x: int, y: int):
         if (x, y) in self.hitbox:
@@ -98,7 +103,7 @@ class InputField(Sprite):
         return self.value
 
     def draw(self):
-        draw_rect(self.x, self.y, self.width, self.height, color=self.color, thickness=self.window.outline)
+        draw_rect(self.x, self.y, self.width, self.height, color=self.color, thickness=config.outline_thickness)
         if not self.selected:
             draw_text(self.x, self.y, self.text + self.value)
         else:
