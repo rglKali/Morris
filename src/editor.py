@@ -179,15 +179,11 @@ class EBoard(tk.SpriteList):
     def mills(self):
         for ind, c1 in enumerate(self._connects):
             for c2 in self._connects[:ind]:
-                points = set(c1 + c2)
+                points = sorted(sorted(list(set(c1 + c2)), key=lambda p: p.gy), key=lambda p: p.gx)
                 if len(points) == 3:
-                    for p1 in points:
-                        for p2 in points:
-                            for p3 in points:
-                                if p1 != p2 and p2 != p3 and p3 != p1 and p2.y - p3.y == p3.y - p1.y and \
-                                        min(p2.x, p1.x) < p3.x < max(p2.x, p1.x) and \
-                                        min(p2.y, p1.y) < p3.y < max(p2.y, p1.y):
-                                    return True
+                    p1, p2, p3 = points
+                    if p3.x - p2.x == p2.x - p1.x and p3.y - p2.y == p2.y - p1.y:
+                        return True
         return False
 
     def _get_blocked(self, p1: 'EGrid', p2: 'EGrid'):
@@ -325,7 +321,7 @@ class Editor(tk.View):
         }
 
     def _check_for_board(self):
-        if len(self.name) >= 6 and self.board.mills and \
+        if self.board.mills and len(self.name) >= 4 and \
                 3 <= int(self.badges) <= 2 * len(self.board.points) - self.board.unconnected:
             self.save.color = tk.palette.light_peach
             self.confirm.color = tk.palette.yellow
