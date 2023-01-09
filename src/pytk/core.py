@@ -37,11 +37,8 @@ class Window:
     def __init__(self, width: int = dev_width, height: int = dev_height,
                  refresh: int = 120, bg: str = palette.white):
 
-        # Create fltk window
-        cree_fenetre(width, height, refresh)
-
-        # Save given width and height
-        self.width, self.height = width, height
+        # Save given width and height, and refresh rate value
+        self.width, self.height, self.refresh = width, height, refresh
 
         # Get dx and dy for further resizing algorithms
         self.dx = width / self.dev_width
@@ -138,6 +135,9 @@ class Window:
         ferme_fenetre()
 
     def run(self):
+        # Create fltk window
+        cree_fenetre(self.width, self.height, self.refresh)
+
         # Start main loop
         while self.active:
 
@@ -178,7 +178,7 @@ class View:
     def on_key_press(self, key: str):
         pass
 
-    def on_mouse_press(self, x: int, y:int, key: str):
+    def on_mouse_press(self, x: int, y: int, key: str):
         pass
 
 
