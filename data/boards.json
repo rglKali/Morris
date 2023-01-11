@@ -151,7 +151,7 @@
     },
     {
         "name": "SpaceShuttle",
-        "size": 4,
+        "size": 5,
         "points": [
             "a1",
             "a5",
@@ -181,7 +181,7 @@
             "c2e3",
             "a1c2"
         ],
-        "badges": 5,
+        "badges": 4,
         "unite": true,
         "skip": false
     },

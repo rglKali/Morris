@@ -23,7 +23,7 @@ class Template(tk.Button):
 
     def __init__(self, data: dict, order: int):
         self.data = data
-        super().__init__(105 + order * 170, 160, 160, 280)
+        super().__init__(105 + order * 170, 160, 160, 280, flex=False)
         self.description = f"{order + 1}. {data['name']}\n" \
                            f"{lang.badges[self.window.lang]}: {data['badges']}\n" \
                            f"{lang.unite[self.window.lang]}: {data['unite']}\n" \
@@ -65,6 +65,10 @@ class Templates(tk.SpriteList):
     def __init__(self):
         super().__init__()
         self._raw = json.load(open('data/boards.json'))
+
+        if not self.window.features:
+            self._raw = self._raw[:3]
+
         for num, board in enumerate(self._raw):
             self.append(Template(board, num))
 

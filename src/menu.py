@@ -55,7 +55,7 @@ class Menu(tk.View):
         if key == 'Escape':
             self.quit.on_click()
         elif self.window.features:
-            if key == 'Return' and len(self.nickname) > 4:
+            if key == 'Return' and len(self.nickname) >= 4:
                 self.play.on_click()
             elif key == 'Left':
                 self.nickname.move_selector_left()

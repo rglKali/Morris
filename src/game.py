@@ -10,26 +10,23 @@ class lang:
     give_up = {'EN': 'Give Up!', 'FR': 'Abandonner!'}
 
 
-class GAction(tk.Sprite):
-    def __init__(self, data: 'Action', order: int):
-        super().__init__()
-        self.order = order
-        self.data = data
-        from_name = f'{data.from_point.name}' if data.from_point is not None else '__'
-        to_name = f'{data.to_point.name}' if data.to_point is not None else '__'
-        self.text = f'[{data.player.name}]: {from_name} -> {to_name}'
-
-    def draw(self):
-        tk.draw_text(520, (self.order + 1) * 15, self.text, font_size=10, location='nw')
-
-
 class History(tk.SpriteList):
     def __init__(self):
         super().__init__()
+        self.max_len = 30
+        self.selector = 0
+
+    def add(self, data: 'Action'):
+        if len(self) >= self.max_len:
+            self.selector += 1
+        from_name = f'{data.from_point.name}' if data.from_point is not None else '__'
+        to_name = f'{data.to_point.name}' if data.to_point is not None else '__'
+        self.append(f'[{data.player.name}]: {from_name} -> {to_name}')
 
     def draw(self):
         tk.draw_rect(610, 240, 200, 460)
-        super().draw()
+        for order, action in enumerate(self[self.selector: min(len(self), self.selector + self.max_len)]):
+            tk.draw_text(520, (order + 1) * 15, action, font_size=10, location='nw')
 
 
 class GPlayer(tk.Sprite):
@@ -158,6 +155,7 @@ class GBoard(tk.SpriteList):
 class GiveUp(tk.Button):
     def on_click(self):
         v = self.window.view
+        v.opposite()
         from .over import Over
         self.window.view = Over(v.active_player)
 
@@ -220,13 +218,13 @@ class Game(tk.View):
             player.phase = 3
 
         for player in self.players:
-            if self.board.amount(player) == 2 and player.phase != 1:
+            if self.board.amount(player) + player.badges == 2:
                 from .over import Over
                 self.window.view = Over(self.opposite(player))
 
         if self.window.features:
-            self.history.append(GAction(Action({'player': player, 'from_point': from_point, 'to_point': to_point}),
-                                        order=len(self.history)))
+            self.history.add(Action({'player': player, 'from_point': from_point, 'to_point': to_point}))
+            print(len(self.history))
         self.active_player = self.opposite()
 
     def on_draw(self):

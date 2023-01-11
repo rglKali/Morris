@@ -3,7 +3,7 @@ import string
 
 from .core import Sprite
 from .data import palette, config
-from .draw import draw_rect, draw_text, draw_line
+from .draw import draw_rect, draw_text, draw_text_flex, draw_line
 from .hitbox import hitbox_rect
 
 
@@ -17,16 +17,20 @@ __all__ = [
 
 class Button(Sprite):
     def __init__(self, x: int, y: int, width: int, height: int, text: str = str(),
-                 color: str = palette.white):
+                 color: str = palette.white, flex: bool = True):
         super().__init__(x, y, hitbox=hitbox_rect(width, height))
         self.color = color
         self.width = width
         self.height = height
         self.text = text
+        self.flex = flex
 
     def draw(self):
         draw_rect(self.x, self.y, self.width, self.height, color=self.color, thickness=config.outline_thickness)
-        draw_text(self.x, self.y, self.text)
+        if self.flex:
+            draw_text_flex(self.x, self.y, self.text, self.width, self.height)
+        else:
+            draw_text(self.x, self.y, self.text)
 
     def click(self, x: int, y: int):
         if self.collides_with_point(x, y):

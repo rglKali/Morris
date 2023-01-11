@@ -5,8 +5,9 @@ from .menu import Menu
 class Window(tk.Window):
     width = 720
     height = 480
-    lang = 'EN'
+    lang = 'FR'
     features = True
+
     if features:
         nickname = 'kali'
         color = tk.palette.orange
